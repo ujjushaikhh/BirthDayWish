@@ -129,7 +129,9 @@ class _IntroScreenState extends State<IntroScreen>
     } catch (_) {}
 
     await Future.delayed(const Duration(milliseconds: 1200));
-    _navigateToWish();
+    if (mounted) {
+      _navigateToWish();
+    }
   }
 
   @override
@@ -172,14 +174,10 @@ class _IntroScreenState extends State<IntroScreen>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final width = size.width;
-    final height = size.height;
 
-    // Responsive scaling factors
-    final cardWidth = width * 0.9;
-    final cardPadding = width * 0.08;
-    final ledHeight = height * 0.07;
-    final ledSize = width * 0.04;
+    // Device detection
+    final isDesktop = size.width > 900;
+    final isTablet = size.width > 600 && size.width <= 900;
 
     return Scaffold(
       body: GestureDetector(
@@ -213,58 +211,60 @@ class _IntroScreenState extends State<IntroScreen>
               },
             ),
 
-            // LED Lights on top - RESPONSIVE
+            // LED Lights on top
             Positioned(
               top: 0,
               left: 0,
               right: 0,
-              child: AnimatedBuilder(
-                animation: _ledController,
-                builder: (context, child) {
-                  return Container(
-                    height: ledHeight,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(15, (index) {
-                        final offset =
-                            (index * 0.2 + _ledController.value) % 1.0;
-                        final opacity =
-                            (math.sin(offset * math.pi * 2) + 1) / 2;
-                        return Container(
-                          width: ledSize,
-                          height: ledSize,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: [
-                              Colors.red,
-                              Colors.yellow,
-                              Colors.green,
-                              Colors.blue,
-                              Colors.purple,
-                            ][index % 5].withOpacity(opacity),
-                            boxShadow: [
-                              BoxShadow(
-                                color: [
-                                  Colors.red,
-                                  Colors.yellow,
-                                  Colors.green,
-                                  Colors.blue,
-                                  Colors.purple,
-                                ][index % 5].withOpacity(opacity),
-                                blurRadius: width * 0.04,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
-                    ),
-                  );
-                },
+              child: SafeArea(
+                child: AnimatedBuilder(
+                  animation: _ledController,
+                  builder: (context, child) {
+                    return SizedBox(
+                      height: 50,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(15, (index) {
+                          final offset =
+                              (index * 0.2 + _ledController.value) % 1.0;
+                          final opacity =
+                              (math.sin(offset * math.pi * 2) + 1) / 2;
+                          return Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: [
+                                Colors.red,
+                                Colors.yellow,
+                                Colors.green,
+                                Colors.blue,
+                                Colors.purple,
+                              ][index % 5].withOpacity(opacity),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: [
+                                    Colors.red,
+                                    Colors.yellow,
+                                    Colors.green,
+                                    Colors.blue,
+                                    Colors.purple,
+                                  ][index % 5].withOpacity(opacity),
+                                  blurRadius: 15,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
 
-            // Floating GIFs (Hearts and Gifts)
+            // Floating Emojis
             ...List.generate(20, (index) => _buildFloatingEmoji(index)),
 
             // Sparkle Overlay
@@ -302,488 +302,436 @@ class _IntroScreenState extends State<IntroScreen>
                 },
               ),
 
-            // Main content with PREMIUM CARD - RESPONSIVE
+            // Main content with PREMIUM CARD
             Center(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.minHeight,
-                      ),
-                      child: FadeTransition(
-                        opacity: _opacityAnimation,
-                        child: ScaleTransition(
-                          scale: _scaleAnimation,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // PREMIUM CARD CONTAINER - RESPONSIVE
-                              AnimatedBuilder(
-                                animation: _cardPulseAnimation,
-                                builder: (context, child) {
-                                  return Transform.scale(
-                                    scale: _cardPulseAnimation.value,
-                                    child: child,
-                                  );
-                                },
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    vertical: isDesktop ? 40 : 20,
+                    horizontal: 20,
+                  ),
+                  child: FadeTransition(
+                    opacity: _opacityAnimation,
+                    child: ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // PREMIUM CARD CONTAINER
+                          AnimatedBuilder(
+                            animation: _cardPulseAnimation,
+                            builder: (context, child) {
+                              return Transform.scale(
+                                scale: _cardPulseAnimation.value,
+                                child: child,
+                              );
+                            },
+                            child: Container(
+                              width: isDesktop ? 500 : (isTablet ? 450 : 390),
+                              constraints: BoxConstraints(
+                                maxWidth: isDesktop ? 500 : 390,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFFFFFFF),
+                                    Color(0xFFFFFAFC),
+                                    Color(0xFFFFFFFF),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFFFF69B4,
+                                    ).withOpacity(0.6),
+                                    blurRadius: 60,
+                                    spreadRadius: 8,
+                                    offset: const Offset(0, 25),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.orange.withOpacity(0.4),
+                                    blurRadius: 50,
+                                    spreadRadius: -5,
+                                    offset: const Offset(0, 20),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.purple.withOpacity(0.3),
+                                    blurRadius: 40,
+                                    spreadRadius: -10,
+                                    offset: const Offset(0, 15),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.9),
+                                    blurRadius: 25,
+                                    offset: const Offset(-12, -12),
+                                  ),
+                                ],
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(40),
+                                  border: Border.all(
+                                    width: 3,
+                                    color: Colors.white,
+                                  ),
+                                ),
                                 child: Container(
-                                  width: cardWidth,
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: width * 0.05,
-                                  ),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                      width * 0.1,
+                                    borderRadius: BorderRadius.circular(37),
+                                    border: Border.all(
+                                      width: 2,
+                                      color: const Color(
+                                        0xFFFFB3C1,
+                                      ).withOpacity(0.4),
                                     ),
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFFFFFFF),
-                                        Color(0xFFFFFAFC),
-                                        Color(0xFFFFFFFF),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(
-                                          0xFFFF69B4,
-                                        ).withOpacity(0.6),
-                                        blurRadius: width * 0.15,
-                                        spreadRadius: 8,
-                                        offset: Offset(0, height * 0.03),
-                                      ),
-                                      BoxShadow(
-                                        color: Colors.orange.withOpacity(0.4),
-                                        blurRadius: width * 0.12,
-                                        spreadRadius: -5,
-                                        offset: Offset(0, height * 0.025),
-                                      ),
-                                      BoxShadow(
-                                        color: Colors.purple.withOpacity(0.3),
-                                        blurRadius: width * 0.1,
-                                        spreadRadius: -10,
-                                        offset: Offset(0, height * 0.018),
-                                      ),
-                                      BoxShadow(
-                                        color: Colors.white.withOpacity(0.9),
-                                        blurRadius: width * 0.06,
-                                        offset: Offset(
-                                          -width * 0.03,
-                                          -width * 0.03,
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                        width * 0.1,
-                                      ),
-                                      border: Border.all(
-                                        width: 3,
-                                        color: Colors.white,
-                                      ),
-                                    ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(35),
                                     child: Container(
+                                      padding: EdgeInsets.all(
+                                        isDesktop ? 45 : (isTablet ? 42 : 40),
+                                      ),
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                          width * 0.092,
-                                        ),
-                                        border: Border.all(
-                                          width: 2,
-                                          color: const Color(
-                                            0xFFFFB3C1,
-                                          ).withOpacity(0.4),
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.white,
+                                            Colors.white.withOpacity(0.98),
+                                            const Color(0xFFFFFAFD),
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
                                         ),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          width * 0.087,
-                                        ),
-                                        child: Container(
-                                          padding: EdgeInsets.all(cardPadding),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.white,
-                                                Colors.white.withOpacity(0.98),
-                                                const Color(0xFFFFFAFD),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Premium Top Badge
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: isDesktop ? 30 : 28,
+                                              vertical: isDesktop ? 12 : 10,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  Color(0xFFFF69B4),
+                                                  Color(0xFFFF8FB4),
+                                                  Color(0xFFFFB3C1),
+                                                ],
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(25),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color(
+                                                    0xFFFF69B4,
+                                                  ).withOpacity(0.5),
+                                                  blurRadius: 20,
+                                                  offset: const Offset(0, 8),
+                                                ),
                                               ],
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.celebration,
+                                                  color: Colors.white,
+                                                  size: isDesktop ? 22 : 20,
+                                                ),
+                                                SizedBox(
+                                                  width: isDesktop ? 10 : 8,
+                                                ),
+                                                Text(
+                                                  "✨ Count Down ✨",
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize:
+                                                        isDesktop ? 16 : 15,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.white,
+                                                    letterSpacing: 1,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          child: Column(
-                                            children: [
-                                              // Premium Top Badge - RESPONSIVE
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: width * 0.07,
-                                                  vertical: height * 0.012,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  gradient:
-                                                      const LinearGradient(
-                                                        colors: [
-                                                          Color(0xFFFF69B4),
-                                                          Color(0xFFFF8FB4),
-                                                          Color(0xFFFFB3C1),
-                                                        ],
-                                                      ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        width * 0.06,
-                                                      ),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: const Color(
-                                                        0xFFFF69B4,
-                                                      ).withOpacity(0.5),
-                                                      blurRadius: width * 0.05,
-                                                      offset: Offset(
-                                                        0,
-                                                        height * 0.01,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.celebration,
-                                                      color: Colors.white,
-                                                      size: width * 0.05,
-                                                    ),
-                                                    SizedBox(
-                                                      width: width * 0.02,
-                                                    ),
-                                                    Text(
-                                                      "✨ Count Down ✨",
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                            fontSize:
-                                                                width * 0.038,
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                            color: Colors.white,
-                                                            letterSpacing: 1,
-                                                          ),
-                                                    ),
-                                                  ],
-                                                ),
+
+                                          SizedBox(height: isDesktop ? 35 : 30),
+
+                                          // Countdown Timer
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: isDesktop ? 40 : 35,
+                                              vertical: isDesktop ? 22 : 20,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  const Color(0xFFFFF5F7),
+                                                  const Color(
+                                                    0xFFFFE5EC,
+                                                  ).withOpacity(0.8),
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
                                               ),
-
-                                              SizedBox(height: height * 0.035),
-
-                                              // Countdown Timer - RESPONSIVE
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: width * 0.087,
-                                                  vertical: height * 0.024,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      const Color(0xFFFFF5F7),
-                                                      const Color(
-                                                        0xFFFFE5EC,
-                                                      ).withOpacity(0.8),
-                                                    ],
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.bottomRight,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        width * 0.075,
-                                                      ),
-                                                  border: Border.all(
-                                                    color: const Color(
-                                                      0xFFFFB3C1,
-                                                    ).withOpacity(0.4),
-                                                    width: 2,
-                                                  ),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: const Color(
-                                                        0xFFFF69B4,
-                                                      ).withOpacity(0.2),
-                                                      blurRadius: width * 0.037,
-                                                      offset: Offset(
-                                                        0,
-                                                        height * 0.006,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.all(
-                                                        width * 0.025,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        gradient:
-                                                            const LinearGradient(
-                                                              colors: [
-                                                                Color(
-                                                                  0xFFFF69B4,
-                                                                ),
-                                                                Color(
-                                                                  0xFFFF8FB4,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                        shape: BoxShape.circle,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: const Color(
-                                                              0xFFFF69B4,
-                                                            ).withOpacity(0.4),
-                                                            blurRadius:
-                                                                width * 0.025,
-                                                            spreadRadius: 2,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: Icon(
-                                                        Icons.timer,
-                                                        color: Colors.white,
-                                                        size: width * 0.07,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: width * 0.037,
-                                                    ),
-                                                    AnimatedBuilder(
-                                                      animation:
-                                                          _shimmerController,
-                                                      builder: (
-                                                        context,
-                                                        child,
-                                                      ) {
-                                                        return ShaderMask(
-                                                          shaderCallback: (
-                                                            bounds,
-                                                          ) {
-                                                            return LinearGradient(
-                                                              colors: const [
-                                                                Color(
-                                                                  0xFFFF69B4,
-                                                                ),
-                                                                Color(
-                                                                  0xFFFF1493,
-                                                                ),
-                                                                Color(
-                                                                  0xFFFF69B4,
-                                                                ),
-                                                              ],
-                                                              stops: [
-                                                                0.0,
-                                                                _shimmerController
-                                                                    .value,
-                                                                1.0,
-                                                              ],
-                                                            ).createShader(
-                                                              bounds,
-                                                            );
-                                                          },
-                                                          child: Text(
-                                                            '00:${_remainingSeconds.toString().padLeft(2, '0')}',
-                                                            style:
-                                                                GoogleFonts.orbitron(
-                                                                  fontSize:
-                                                                      width *
-                                                                      0.1,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w900,
-                                                                  color:
-                                                                      Colors
-                                                                          .white,
-                                                                  letterSpacing:
-                                                                      3,
-                                                                ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              border: Border.all(
+                                                color: const Color(
+                                                  0xFFFFB3C1,
+                                                ).withOpacity(0.4),
+                                                width: 2,
                                               ),
-
-                                              SizedBox(height: height * 0.04),
-
-                                              // Gift emoji - RESPONSIVE
-                                              AnimatedBuilder(
-                                                animation: _pulseAnimation,
-                                                builder: (context, child) {
-                                                  return Transform.scale(
-                                                    scale:
-                                                        _pulseAnimation.value,
-                                                    child: Container(
-                                                      padding: EdgeInsets.all(
-                                                        width * 0.075,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        gradient: RadialGradient(
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color(
+                                                    0xFFFF69B4,
+                                                  ).withOpacity(0.2),
+                                                  blurRadius: 15,
+                                                  offset: const Offset(0, 5),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.all(
+                                                    isDesktop ? 12 : 10,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    gradient:
+                                                        const LinearGradient(
                                                           colors: [
-                                                            const Color(
-                                                              0xFFFFB3C1,
-                                                            ).withOpacity(0.3),
-                                                            const Color(
-                                                              0xFFFF69B4,
-                                                            ).withOpacity(0.1),
-                                                            Colors.transparent,
+                                                            Color(0xFFFF69B4),
+                                                            Color(0xFFFF8FB4),
                                                           ],
                                                         ),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: const Color(
-                                                              0xFFFF69B4,
-                                                            ).withOpacity(
-                                                              0.4 *
-                                                                  _pulseAnimation
-                                                                      .value,
-                                                            ),
-                                                            blurRadius:
-                                                                width *
-                                                                0.1 *
-                                                                _pulseAnimation
-                                                                    .value,
-                                                            spreadRadius:
-                                                                width *
-                                                                0.025 *
-                                                                _pulseAnimation
-                                                                    .value,
-                                                          ),
-                                                        ],
+                                                    shape: BoxShape.circle,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: const Color(
+                                                          0xFFFF69B4,
+                                                        ).withOpacity(0.4),
+                                                        blurRadius: 10,
+                                                        spreadRadius: 2,
                                                       ),
-                                                      child: Text(
-                                                        '🎁',
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.25,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-
-                                              SizedBox(height: height * 0.04),
-
-                                              // Main text - RESPONSIVE
-                                              ShaderMask(
-                                                shaderCallback: (bounds) {
-                                                  return LinearGradient(
-                                                    colors: [
-                                                      const Color(0xFFFF69B4),
-                                                      const Color(0xFFFF1493),
-                                                      const Color(0xFFFF69B4),
                                                     ],
-                                                  ).createShader(bounds);
-                                                },
-                                                child: Text(
-                                                  'Something Special\nIs Coming...',
-                                                  textAlign: TextAlign.center,
-                                                  style: GoogleFonts.greatVibes(
-                                                    fontSize: width * 0.12,
-                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.timer,
                                                     color: Colors.white,
-                                                    height: 1.3,
+                                                    size: isDesktop ? 30 : 28,
                                                   ),
                                                 ),
-                                              ),
-
-                                              SizedBox(height: height * 0.03),
-
-                                              // Bottom message - RESPONSIVE
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: width * 0.075,
-                                                  vertical: height * 0.018,
+                                                SizedBox(
+                                                  width: isDesktop ? 18 : 15,
                                                 ),
-                                                decoration: BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      const Color(0xFFFFF5F7),
-                                                      const Color(
-                                                        0xFFFFE5EC,
-                                                      ).withOpacity(0.6),
+                                                AnimatedBuilder(
+                                                  animation: _shimmerController,
+                                                  builder: (context, child) {
+                                                    return ShaderMask(
+                                                      shaderCallback: (bounds) {
+                                                        return LinearGradient(
+                                                          colors: const [
+                                                            Color(0xFFFF69B4),
+                                                            Color(0xFFFF1493),
+                                                            Color(0xFFFF69B4),
+                                                          ],
+                                                          stops: [
+                                                            0.0,
+                                                            _shimmerController
+                                                                .value,
+                                                            1.0,
+                                                          ],
+                                                        ).createShader(bounds);
+                                                      },
+                                                      child: Text(
+                                                        '00:${_remainingSeconds.toString().padLeft(2, '0')}',
+                                                        style:
+                                                            GoogleFonts.orbitron(
+                                                              fontSize:
+                                                                  isDesktop
+                                                                      ? 44
+                                                                      : 40,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w900,
+                                                              color:
+                                                                  Colors.white,
+                                                              letterSpacing: 3,
+                                                            ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          SizedBox(height: isDesktop ? 40 : 35),
+
+                                          // Gift emoji
+                                          AnimatedBuilder(
+                                            animation: _pulseAnimation,
+                                            builder: (context, child) {
+                                              return Transform.scale(
+                                                scale: _pulseAnimation.value,
+                                                child: Container(
+                                                  padding: EdgeInsets.all(
+                                                    isDesktop ? 35 : 30,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    gradient: RadialGradient(
+                                                      colors: [
+                                                        const Color(
+                                                          0xFFFFB3C1,
+                                                        ).withOpacity(0.3),
+                                                        const Color(
+                                                          0xFFFF69B4,
+                                                        ).withOpacity(0.1),
+                                                        Colors.transparent,
+                                                      ],
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: const Color(
+                                                          0xFFFF69B4,
+                                                        ).withOpacity(
+                                                          0.4 *
+                                                              _pulseAnimation
+                                                                  .value,
+                                                        ),
+                                                        blurRadius:
+                                                            40 *
+                                                            _pulseAnimation
+                                                                .value,
+                                                        spreadRadius:
+                                                            10 *
+                                                            _pulseAnimation
+                                                                .value,
+                                                      ),
                                                     ],
                                                   ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        width * 0.062,
-                                                      ),
-                                                  border: Border.all(
-                                                    color: const Color(
-                                                      0xFFFFB3C1,
-                                                    ).withOpacity(0.3),
-                                                    width: 1.5,
+                                                  child: Text(
+                                                    '🎁',
+                                                    style: TextStyle(
+                                                      fontSize:
+                                                          isDesktop ? 110 : 100,
+                                                    ),
                                                   ),
                                                 ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Text(
-                                                      '🎉',
-                                                      style: TextStyle(
-                                                        fontSize: width * 0.05,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: width * 0.025,
-                                                    ),
-                                                    Text(
-                                                      'Get ready!',
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                            fontSize:
-                                                                width * 0.045,
-                                                            color: const Color(
-                                                              0xFFFF1493,
-                                                            ),
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                            letterSpacing: 0.5,
-                                                          ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: width * 0.025,
-                                                    ),
-                                                    Text(
-                                                      '🎉',
-                                                      style: TextStyle(
-                                                        fontSize: width * 0.05,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
+                                              );
+                                            },
                                           ),
-                                        ),
+
+                                          SizedBox(height: isDesktop ? 40 : 35),
+
+                                          // Main text
+                                          ShaderMask(
+                                            shaderCallback: (bounds) {
+                                              return const LinearGradient(
+                                                colors: [
+                                                  Color(0xFFFF69B4),
+                                                  Color(0xFFFF1493),
+                                                  Color(0xFFFF69B4),
+                                                ],
+                                              ).createShader(bounds);
+                                            },
+                                            child: Text(
+                                              'Something Special\nIs Coming...',
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.greatVibes(
+                                                fontSize: isDesktop ? 54 : 48,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                height: 1.3,
+                                              ),
+                                            ),
+                                          ),
+
+                                          SizedBox(height: isDesktop ? 30 : 25),
+
+                                          // Bottom message
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: isDesktop ? 32 : 30,
+                                              vertical: isDesktop ? 17 : 15,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  const Color(0xFFFFF5F7),
+                                                  const Color(
+                                                    0xFFFFE5EC,
+                                                  ).withOpacity(0.6),
+                                                ],
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(25),
+                                              border: Border.all(
+                                                color: const Color(
+                                                  0xFFFFB3C1,
+                                                ).withOpacity(0.3),
+                                                width: 1.5,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  '🎉',
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        isDesktop ? 22 : 20,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: isDesktop ? 12 : 10,
+                                                ),
+                                                Text(
+                                                  'Get ready!',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize:
+                                                        isDesktop ? 19 : 18,
+                                                    color: const Color(
+                                                      0xFFFF1493,
+                                                    ),
+                                                    fontWeight: FontWeight.w700,
+                                                    letterSpacing: 0.5,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: isDesktop ? 12 : 10,
+                                                ),
+                                                Text(
+                                                  '🎉',
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        isDesktop ? 22 : 20,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             ),
 
@@ -817,7 +765,7 @@ class _IntroScreenState extends State<IntroScreen>
     final random = index * 47;
     final left = (random % 100).toDouble();
     final duration = 4 + (random % 5);
-    final emojiSize = size.width * 0.06 + (random % 20).toDouble();
+    final emojiSize = 25.0 + (random % 20).toDouble();
 
     return Positioned(
       left: size.width * (left / 100),

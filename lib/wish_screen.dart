@@ -27,7 +27,6 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool showMain = false;
   bool showLetter = false;
-  bool isCelebrating = false;
   Offset? _tapPosition;
 
   @override
@@ -136,12 +135,16 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
     final width = size.width;
     final height = size.height;
 
+    // Determine if desktop/tablet
+    final isDesktop = width > 900;
+    final isTablet = width > 600 && width <= 900;
+
     return Scaffold(
       body: GestureDetector(
         onTapDown: _onTapDown,
         child: Stack(
           children: [
-            // Premium Animated Background with shimmer
+            // Premium Animated Background
             AnimatedBuilder(
               animation: _shimmerController,
               builder: (context, child) {
@@ -171,428 +174,442 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
             // Floating Hearts
             ...List.generate(18, (i) => _floatingParticles(i)),
 
-            // LOTTIE ANIMATIONS - RESPONSIVE
-
-            // Sparkles Burst - Top Left Corner
+            // LOTTIE ANIMATIONS - Responsive positioning
             Positioned(
-              top: height * 0.05,
-              left: width * 0.02,
+              top: 40,
+              left: 10,
               child: Lottie.asset(
                 'assets/lottie/Sparkles_burst.json',
-                width: width * 0.5,
-                height: height * 0.25,
+                width: 200,
+                height: 200,
                 fit: BoxFit.contain,
               ),
             ),
-
-            // Fireworks - Top Right Corner
             Positioned(
-              top: height * 0.04,
-              right: width * 0.01,
+              top: 30,
+              right: 5,
               child: Lottie.asset(
                 'assets/lottie/Fireworks.json',
-                width: width * 0.58,
-                height: height * 0.28,
+                width: 230,
+                height: 230,
                 fit: BoxFit.contain,
               ),
             ),
-
-            // Blast/Confetti Rain - Top Center (falling effect)
             Positioned(
               top: 0,
-              left: width * 0.25,
+              left: size.width * 0.25,
               child: Lottie.asset(
                 'assets/lottie/Confetti.json',
-                width: width * 0.42,
-                height: height * 0.21,
+                width: 170,
+                height: 170,
                 fit: BoxFit.contain,
               ),
             ),
-
             Positioned(
               top: 0,
-              right: width * 0.25,
+              right: size.width * 0.25,
               child: Lottie.asset(
                 'assets/lottie/PartyPopper.json',
-                width: width * 0.42,
-                height: height * 0.21,
+                width: 170,
+                height: 170,
                 fit: BoxFit.contain,
               ),
             ),
-
             Positioned(
               top: 0,
-              left: width * 0.25,
+              left: size.width * 0.25,
               child: Lottie.asset(
                 'assets/lottie/Blast.json',
-                width: width * 0.5,
-                height: height * 0.31,
+                width: size.width * 0.5,
+                height: 250,
                 fit: BoxFit.cover,
                 repeat: true,
               ),
             ),
-
-            // Balloons - Bottom Right Corner
             Positioned(
-              bottom: height * 0.075,
-              right: width * 0.025,
+              bottom: 60,
+              right: 10,
               child: Lottie.asset(
                 'assets/lottie/Balloons.json',
-                width: width * 0.75,
-                height: height * 0.37,
+                width: 300,
+                height: 300,
+                fit: BoxFit.contain,
+              ),
+            ),
+            Positioned(
+              bottom: 70,
+              left: 10,
+              child: Lottie.asset(
+                'assets/lottie/Balloons.json',
+                width: 300,
+                height: 300,
                 fit: BoxFit.contain,
               ),
             ),
 
-            // Gift/Present - Bottom Left Corner
-            Positioned(
-              bottom: height * 0.087,
-              left: width * 0.025,
-              child: Lottie.asset(
-                'assets/lottie/Balloons.json',
-                width: width * 0.75,
-                height: height * 0.37,
-                fit: BoxFit.contain,
-              ),
-            ),
-
-            // Main Content - RESPONSIVE
+            // Main Content - PROPERLY RESPONSIVE
             Center(
-              child: AnimatedOpacity(
-                opacity: showMain ? 1 : 0,
-                duration: const Duration(milliseconds: 1500),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: height * 0.1),
+              child: SafeArea(
+                child: AnimatedOpacity(
+                  opacity: showMain ? 1 : 0,
+                  duration: const Duration(milliseconds: 1500),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: isDesktop ? 40 : 20,
+                        horizontal: 20,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: isDesktop ? 60 : 80),
 
-                      // Animated floating title - RESPONSIVE
-                      AnimatedBuilder(
-                        animation: _floatController,
-                        builder: (context, child) {
-                          return Transform.translate(
-                            offset: Offset(0, 10 * _floatController.value),
-                            child: child,
-                          );
-                        },
-                        child: ShaderMask(
-                          shaderCallback: (bounds) {
-                            return const LinearGradient(
-                              colors: [
-                                Colors.white,
-                                Color(0xFFFFB3C1),
-                                Colors.white,
-                              ],
-                            ).createShader(bounds);
-                          },
-                          child: Text(
-                            "Happy Birthday",
-                            style: GoogleFonts.greatVibes(
-                              fontSize: width * 0.175,
+                          // Animated floating title
+                          AnimatedBuilder(
+                            animation: _floatController,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(0, 10 * _floatController.value),
+                                child: child,
+                              );
+                            },
+                            child: ShaderMask(
+                              shaderCallback: (bounds) {
+                                return const LinearGradient(
+                                  colors: [
+                                    Colors.white,
+                                    Color(0xFFFFB3C1),
+                                    Colors.white,
+                                  ],
+                                ).createShader(bounds);
+                              },
+                              child: Text(
+                                "Happy Birthday",
+                                style: GoogleFonts.greatVibes(
+                                  fontSize:
+                                      isDesktop ? 80 : (isTablet ? 65 : 70),
+                                  color: Colors.white,
+                                  shadows: const [
+                                    Shadow(
+                                      color: Color(0xFFFF69B4),
+                                      blurRadius: 30,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          Text(
+                            widget.name,
+                            style: GoogleFonts.poppins(
+                              fontSize: isDesktop ? 38 : (isTablet ? 34 : 32),
                               color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 3,
                               shadows: const [
-                                Shadow(
-                                  color: Color(0xFFFF69B4),
-                                  blurRadius: 30,
-                                ),
+                                Shadow(color: Colors.black26, blurRadius: 10),
                               ],
                             ),
                           ),
-                        ),
-                      ),
 
-                      SizedBox(height: height * 0.012),
+                          SizedBox(height: isDesktop ? 50 : 40),
 
-                      Text(
-                        widget.name,
-                        style: GoogleFonts.poppins(
-                          fontSize: width * 0.08,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 3,
-                          shadows: const [
-                            Shadow(color: Colors.black26, blurRadius: 10),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: height * 0.05),
-
-                      // PREMIUM CARD - RESPONSIVE
-                      AnimatedBuilder(
-                        animation: _cardPulseAnimation,
-                        builder: (context, child) {
-                          return Transform.scale(
-                            scale: _cardPulseAnimation.value,
-                            child: child,
-                          );
-                        },
-                        child: Container(
-                          width: width * 0.9,
-                          margin: EdgeInsets.symmetric(
-                            horizontal: width * 0.05,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(width * 0.087),
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFFFFFFFF),
-                                Color(0xFFFFF5F7),
-                                Color(0xFFFFFFFF),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFFF69B4).withOpacity(0.4),
-                                blurRadius: width * 0.125,
-                                spreadRadius: 5,
-                                offset: Offset(0, height * 0.025),
-                              ),
-                              BoxShadow(
-                                color: Colors.orange.withOpacity(0.3),
-                                blurRadius: width * 0.1,
-                                spreadRadius: -5,
-                                offset: Offset(0, height * 0.018),
-                              ),
-                              BoxShadow(
-                                color: Colors.white.withOpacity(0.9),
-                                blurRadius: width * 0.05,
-                                offset: Offset(-width * 0.025, -width * 0.025),
-                              ),
-                            ],
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                width * 0.087,
-                              ),
-                              border: Border.all(width: 3, color: Colors.white),
-                            ),
+                          // PREMIUM CARD - Fixed for all screen sizes
+                          AnimatedBuilder(
+                            animation: _cardPulseAnimation,
+                            builder: (context, child) {
+                              return Transform.scale(
+                                scale: _cardPulseAnimation.value,
+                                child: child,
+                              );
+                            },
                             child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  width * 0.08,
-                                ),
-                                border: Border.all(
-                                  width: 2,
-                                  color: const Color(
-                                    0xFFFFB3C1,
-                                  ).withOpacity(0.3),
-                                ),
+                              width: isDesktop ? 500 : (isTablet ? 450 : 360),
+                              constraints: BoxConstraints(
+                                maxWidth: isDesktop ? 500 : 360,
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  width * 0.075,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(35),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFFFFFFF),
+                                    Color(0xFFFFF5F7),
+                                    Color(0xFFFFFFFF),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFFFF69B4,
+                                    ).withOpacity(0.4),
+                                    blurRadius: 50,
+                                    spreadRadius: 5,
+                                    offset: const Offset(0, 20),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.orange.withOpacity(0.3),
+                                    blurRadius: 40,
+                                    spreadRadius: -5,
+                                    offset: const Offset(0, 15),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.9),
+                                    blurRadius: 20,
+                                    offset: const Offset(-10, -10),
+                                  ),
+                                ],
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(35),
+                                  border: Border.all(
+                                    width: 3,
+                                    color: Colors.white,
+                                  ),
                                 ),
                                 child: Container(
-                                  padding: EdgeInsets.all(width * 0.087),
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.white,
-                                        Colors.white.withOpacity(0.95),
-                                        const Color(0xFFFFFAFD),
-                                      ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
+                                    borderRadius: BorderRadius.circular(32),
+                                    border: Border.all(
+                                      width: 2,
+                                      color: const Color(
+                                        0xFFFFB3C1,
+                                      ).withOpacity(0.3),
                                     ),
                                   ),
-                                  child: Column(
-                                    children: [
-                                      // Decorative top element - RESPONSIVE
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: width * 0.062,
-                                          vertical: height * 0.01,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color(0xFFFF69B4),
-                                              Color(0xFFFFB3C1),
-                                            ],
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            width * 0.05,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: const Color(
-                                                0xFFFF69B4,
-                                              ).withOpacity(0.4),
-                                              blurRadius: width * 0.037,
-                                              offset: Offset(0, height * 0.006),
-                                            ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(30),
+                                    child: Container(
+                                      padding: EdgeInsets.all(
+                                        isDesktop ? 40 : (isTablet ? 35 : 35),
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.white,
+                                            Colors.white.withOpacity(0.95),
+                                            const Color(0xFFFFFAFD),
                                           ],
-                                        ),
-                                        child: Text(
-                                          "✨ Special Day ✨",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: width * 0.035,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                            letterSpacing: 1,
-                                          ),
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
                                         ),
                                       ),
-
-                                      SizedBox(height: height * 0.031),
-
-                                      // Central Lottie Animation - RESPONSIVE
-                                      Container(
-                                        height: height * 0.22,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          gradient: RadialGradient(
-                                            colors: [
-                                              const Color(
-                                                0xFFFFB3C1,
-                                              ).withOpacity(0.2),
-                                              Colors.transparent,
-                                            ],
-                                          ),
-                                        ),
-                                        child: Lottie.asset(
-                                          'assets/lottie/pink_cake.json',
-                                          width: width * 0.45,
-                                          height: height * 0.22,
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-
-                                      SizedBox(height: height * 0.031),
-
-                                      // Message with decorative elements - RESPONSIVE
-                                      Container(
-                                        padding: EdgeInsets.all(width * 0.05),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFFFF5F7),
-                                          borderRadius: BorderRadius.circular(
-                                            width * 0.05,
-                                          ),
-                                          border: Border.all(
-                                            color: const Color(
-                                              0xFFFFB3C1,
-                                            ).withOpacity(0.3),
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          "I hope your heart smiles today,\nbecause you deserve the world —\nand a little more. ✨💝",
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: width * 0.041,
-                                            color: const Color(0xFF333333),
-                                            height: 1.8,
-                                            fontWeight: FontWeight.w500,
-                                            letterSpacing: 0.3,
-                                          ),
-                                        ),
-                                      ),
-
-                                      SizedBox(height: height * 0.037),
-
-                                      // Premium Gift Button - RESPONSIVE
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            width * 0.075,
-                                          ),
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color(0xFFFF69B4),
-                                              Color(0xFFFF8FB4),
-                                            ],
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: const Color(
-                                                0xFFFF69B4,
-                                              ).withOpacity(0.5),
-                                              blurRadius: width * 0.05,
-                                              offset: Offset(0, height * 0.012),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ElevatedButton.icon(
-                                          onPressed: _openLetter,
-                                          icon: Icon(
-                                            Icons.card_giftcard,
-                                            size: width * 0.06,
-                                            color: Colors.white,
-                                          ),
-                                          label: Text(
-                                            "Open Gift 🎁",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: width * 0.042,
-                                              fontWeight: FontWeight.w700,
-                                              letterSpacing: 0.5,
-                                            ),
-                                          ),
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.white,
-                                            backgroundColor: Colors.transparent,
-                                            shadowColor: Colors.transparent,
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: width * 0.1,
-                                              vertical: height * 0.022,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                    width * 0.075,
-                                                  ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-
-                                      SizedBox(height: height * 0.018),
-
-                                      // Tap hint with icon - RESPONSIVE
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(
-                                            Icons.touch_app,
-                                            color: const Color(
-                                              0xFFFF69B4,
-                                            ).withOpacity(0.7),
-                                            size: width * 0.045,
-                                          ),
-                                          SizedBox(width: width * 0.02),
-                                          Text(
-                                            "Tap anywhere for magic ✨",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: width * 0.032,
-                                              color: const Color(0xFF666666),
-                                              fontStyle: FontStyle.italic,
-                                              fontWeight: FontWeight.w500,
+                                          // Decorative top badge
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: isDesktop ? 28 : 25,
+                                              vertical: isDesktop ? 10 : 8,
                                             ),
+                                            decoration: BoxDecoration(
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  Color(0xFFFF69B4),
+                                                  Color(0xFFFFB3C1),
+                                                ],
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color(
+                                                    0xFFFF69B4,
+                                                  ).withOpacity(0.4),
+                                                  blurRadius: 15,
+                                                  offset: const Offset(0, 5),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Text(
+                                              "✨ Special Day ✨",
+                                              style: GoogleFonts.poppins(
+                                                fontSize: isDesktop ? 16 : 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.white,
+                                                letterSpacing: 1,
+                                              ),
+                                            ),
+                                          ),
+
+                                          SizedBox(height: isDesktop ? 30 : 25),
+
+                                          // Pink Cake Lottie
+                                          Container(
+                                            height:
+                                                isDesktop
+                                                    ? 200
+                                                    : (isTablet ? 190 : 180),
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              gradient: RadialGradient(
+                                                colors: [
+                                                  const Color(
+                                                    0xFFFFB3C1,
+                                                  ).withOpacity(0.2),
+                                                  Colors.transparent,
+                                                ],
+                                              ),
+                                            ),
+                                            child: Lottie.asset(
+                                              'assets/lottie/pink_cake.json',
+                                              width:
+                                                  isDesktop
+                                                      ? 200
+                                                      : (isTablet ? 190 : 180),
+                                              height:
+                                                  isDesktop
+                                                      ? 200
+                                                      : (isTablet ? 190 : 180),
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+
+                                          SizedBox(height: isDesktop ? 30 : 25),
+
+                                          // Message
+                                          Container(
+                                            padding: EdgeInsets.all(
+                                              isDesktop ? 22 : 20,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFFFF5F7),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: const Color(
+                                                  0xFFFFB3C1,
+                                                ).withOpacity(0.3),
+                                                width: 1.5,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              "I hope your heart smiles today,\nbecause you deserve the world —\nand a little more. ✨💝",
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.poppins(
+                                                fontSize:
+                                                    isDesktop
+                                                        ? 18
+                                                        : (isTablet
+                                                            ? 17
+                                                            : 16.5),
+                                                color: const Color(0xFF333333),
+                                                height: 1.8,
+                                                fontWeight: FontWeight.w500,
+                                                letterSpacing: 0.3,
+                                              ),
+                                            ),
+                                          ),
+
+                                          SizedBox(height: isDesktop ? 35 : 30),
+
+                                          // Gift Button
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  Color(0xFFFF69B4),
+                                                  Color(0xFFFF8FB4),
+                                                ],
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color(
+                                                    0xFFFF69B4,
+                                                  ).withOpacity(0.5),
+                                                  blurRadius: 20,
+                                                  offset: const Offset(0, 10),
+                                                ),
+                                              ],
+                                            ),
+                                            child: ElevatedButton.icon(
+                                              onPressed: _openLetter,
+                                              icon: Icon(
+                                                Icons.card_giftcard,
+                                                size: isDesktop ? 26 : 24,
+                                                color: Colors.white,
+                                              ),
+                                              label: Text(
+                                                "Open Gift 🎁",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: isDesktop ? 18 : 17,
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                shadowColor: Colors.transparent,
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal:
+                                                      isDesktop ? 45 : 40,
+                                                  vertical: isDesktop ? 20 : 18,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+                                          SizedBox(height: isDesktop ? 18 : 15),
+
+                                          // Tap hint
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.touch_app,
+                                                color: const Color(
+                                                  0xFFFF69B4,
+                                                ).withOpacity(0.7),
+                                                size: isDesktop ? 20 : 18,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                "Tap anywhere for magic ✨",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: isDesktop ? 14 : 13,
+                                                  color: const Color(
+                                                    0xFF666666,
+                                                  ),
+                                                  fontStyle: FontStyle.italic,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
 
-                      SizedBox(height: height * 0.1),
-                    ],
+                          SizedBox(height: isDesktop ? 60 : 80),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
 
-            // Confetti Overlay - Position based on tap
+            // Confetti Overlay
             if (_tapPosition != null)
               Positioned(
                 left: _tapPosition!.dx,
@@ -624,18 +641,15 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
     );
   }
 
-  // Animated Letter Overlay - RESPONSIVE
   Widget _buildLetterOverlay() {
     final size = MediaQuery.of(context).size;
-    final width = size.width;
-    final height = size.height;
+    final isDesktop = size.width > 900;
 
     return AnimatedBuilder(
       animation: _letterController,
       builder: (context, child) {
         return Stack(
           children: [
-            // Dark backdrop
             GestureDetector(
               onTap: _closeLetter,
               child: Container(
@@ -644,92 +658,78 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                 ),
               ),
             ),
-
-            // Animated Letter
             Center(
               child: Transform.translate(
-                offset: Offset(0, height * _letterSlideAnimation.value),
+                offset: Offset(0, size.height * _letterSlideAnimation.value),
                 child: Transform.rotate(
                   angle: _letterRotateAnimation.value,
                   child: Transform.scale(
                     scale: _letterScaleAnimation.value,
                     child: Container(
-                      width: width * 0.9,
-                      height: height * 0.65,
-                      margin: EdgeInsets.all(width * 0.05),
+                      width: isDesktop ? 450 : 360,
+                      height: isDesktop ? 600 : 520,
+                      margin: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFF8E7),
-                        borderRadius: BorderRadius.circular(width * 0.05),
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.5),
-                            blurRadius: width * 0.1,
-                            offset: Offset(0, height * 0.018),
+                            blurRadius: 40,
+                            offset: const Offset(0, 15),
                           ),
                         ],
                       ),
                       child: Stack(
                         children: [
-                          // Decorative Border Pattern
                           Positioned.fill(
                             child: Container(
-                              margin: EdgeInsets.all(width * 0.05),
+                              margin: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                 border: Border.all(
                                   color: const Color(0xFFFFC0CB),
                                   width: 3,
                                 ),
-                                borderRadius: BorderRadius.circular(
-                                  width * 0.037,
-                                ),
+                                borderRadius: BorderRadius.circular(15),
                               ),
                             ),
                           ),
-
-                          // Letter Content
                           Padding(
-                            padding: EdgeInsets.all(width * 0.1),
+                            padding: const EdgeInsets.all(40),
                             child: Column(
                               children: [
-                                // Decorative hearts at top - RESPONSIVE
-                                Row(
+                                const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
                                       Icons.favorite,
-                                      color: const Color(0xFFFF69B4),
-                                      size: width * 0.055,
+                                      color: Color(0xFFFF69B4),
+                                      size: 22,
                                     ),
-                                    SizedBox(width: width * 0.025),
+                                    SizedBox(width: 10),
                                     Icon(
                                       Icons.favorite,
-                                      color: const Color(0xFFFFC0CB),
-                                      size: width * 0.045,
+                                      color: Color(0xFFFFC0CB),
+                                      size: 18,
                                     ),
-                                    SizedBox(width: width * 0.025),
+                                    SizedBox(width: 10),
                                     Icon(
                                       Icons.favorite,
-                                      color: const Color(0xFFFF69B4),
-                                      size: width * 0.055,
+                                      color: Color(0xFFFF69B4),
+                                      size: 22,
                                     ),
                                   ],
                                 ),
-
-                                SizedBox(height: height * 0.031),
-
-                                // Greeting - RESPONSIVE
+                                const SizedBox(height: 25),
                                 Text(
                                   "Dear ${widget.name},",
                                   style: GoogleFonts.dancingScript(
-                                    fontSize: width * 0.08,
+                                    fontSize: isDesktop ? 34 : 32,
                                     fontWeight: FontWeight.bold,
                                     color: const Color(0xFFD14D72),
                                   ),
                                 ),
-
-                                SizedBox(height: height * 0.031),
-
-                                // Message content - RESPONSIVE
+                                const SizedBox(height: 25),
                                 Expanded(
                                   child: SingleChildScrollView(
                                     child: Text(
@@ -739,7 +739,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                       "With all my love and warm wishes,\nHappy Birthday! 🎂✨💝",
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.poppins(
-                                        fontSize: width * 0.037,
+                                        fontSize: isDesktop ? 16 : 15,
                                         color: const Color(0xFF654321),
                                         height: 1.8,
                                         letterSpacing: 0.3,
@@ -747,29 +747,24 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-
-                                SizedBox(height: height * 0.031),
-
-                                // Close Button - RESPONSIVE
+                                const SizedBox(height: 25),
                                 ElevatedButton(
                                   onPressed: _closeLetter,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFFF69B4),
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: width * 0.125,
-                                      vertical: height * 0.017,
+                                      horizontal: isDesktop ? 55 : 50,
+                                      vertical: isDesktop ? 16 : 14,
                                     ),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        width * 0.062,
-                                      ),
+                                      borderRadius: BorderRadius.circular(25),
                                     ),
                                     elevation: 8,
                                   ),
                                   child: Text(
                                     "Close Letter 💌",
                                     style: GoogleFonts.poppins(
-                                      fontSize: width * 0.04,
+                                      fontSize: isDesktop ? 17 : 16,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                     ),
@@ -791,12 +786,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
     );
   }
 
-  // Floating Hearts - RESPONSIVE
   Widget _floatingParticles(int i) {
-    final size = MediaQuery.of(context).size;
-    final width = size.width;
-    final height = size.height;
-
     return TweenAnimationBuilder<double>(
       key: ValueKey('heart_$i'),
       tween: Tween(begin: 1, end: 0),
@@ -806,8 +796,8 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
       },
       builder: (context, value, child) {
         return Positioned(
-          left: (i * 60) % width,
-          bottom: -30 + (height * (1 - value)),
+          left: (i * 60) % MediaQuery.of(context).size.width,
+          bottom: -30 + (MediaQuery.of(context).size.height * (1 - value)),
           child: Opacity(
             opacity: value * 0.7,
             child: Transform.rotate(
@@ -821,7 +811,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                       const Color(0xFFDDA0DD),
                       const Color(0xFFFFB347),
                     ][i % 4],
-                size: width * 0.037 + (i % 10).toDouble(),
+                size: 15 + (i % 10).toDouble(),
               ),
             ),
           ),
