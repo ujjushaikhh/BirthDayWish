@@ -133,6 +133,8 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
 
     return Scaffold(
       body: GestureDetector(
@@ -169,28 +171,28 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
             // Floating Hearts
             ...List.generate(18, (i) => _floatingParticles(i)),
 
-            // LOTTIE ANIMATIONS - PROPERLY POSITIONED
+            // LOTTIE ANIMATIONS - RESPONSIVE
 
             // Sparkles Burst - Top Left Corner
             Positioned(
-              top: 40,
-              left: 10,
+              top: height * 0.05,
+              left: width * 0.02,
               child: Lottie.asset(
                 'assets/lottie/Sparkles_burst.json',
-                width: 200,
-                height: 200,
+                width: width * 0.5,
+                height: height * 0.25,
                 fit: BoxFit.contain,
               ),
             ),
 
-            // Balloons - Top Right Corner (floating upward)
+            // Fireworks - Top Right Corner
             Positioned(
-              top: 30,
-              right: 5,
+              top: height * 0.04,
+              right: width * 0.01,
               child: Lottie.asset(
                 'assets/lottie/Fireworks.json',
-                width: 230,
-                height: 230,
+                width: width * 0.58,
+                height: height * 0.28,
                 fit: BoxFit.contain,
               ),
             ),
@@ -198,64 +200,63 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
             // Blast/Confetti Rain - Top Center (falling effect)
             Positioned(
               top: 0,
-              left: size.width * 0.25,
-
+              left: width * 0.25,
               child: Lottie.asset(
                 'assets/lottie/Confetti.json',
-                width: 170,
-                height: 170,
+                width: width * 0.42,
+                height: height * 0.21,
                 fit: BoxFit.contain,
               ),
             ),
+
             Positioned(
               top: 0,
-              right: size.width * 0.25,
+              right: width * 0.25,
               child: Lottie.asset(
                 'assets/lottie/PartyPopper.json',
-                width: 170,
-                height: 170,
+                width: width * 0.42,
+                height: height * 0.21,
                 fit: BoxFit.contain,
               ),
             ),
+
             Positioned(
               top: 0,
-              left: size.width * 0.25,
+              left: width * 0.25,
               child: Lottie.asset(
                 'assets/lottie/Blast.json',
-                width: size.width * 0.5,
-                height: 250,
+                width: width * 0.5,
+                height: height * 0.31,
                 fit: BoxFit.cover,
                 repeat: true,
               ),
             ),
 
-            // Fireworks - Bottom Right Corner
+            // Balloons - Bottom Right Corner
             Positioned(
-              bottom: 60,
-              right: 10,
+              bottom: height * 0.075,
+              right: width * 0.025,
               child: Lottie.asset(
                 'assets/lottie/Balloons.json',
-                width: 300,
-                height: 300,
+                width: width * 0.75,
+                height: height * 0.37,
                 fit: BoxFit.contain,
               ),
             ),
 
             // Gift/Present - Bottom Left Corner
             Positioned(
-              bottom: 70,
-              left: 10,
+              bottom: height * 0.087,
+              left: width * 0.025,
               child: Lottie.asset(
                 'assets/lottie/Balloons.json',
-                width: 300,
-                height: 300,
+                width: width * 0.75,
+                height: height * 0.37,
                 fit: BoxFit.contain,
               ),
             ),
 
-            // Confetti - Center Bottom
-
-            // Main Content
+            // Main Content - RESPONSIVE
             Center(
               child: AnimatedOpacity(
                 opacity: showMain ? 1 : 0,
@@ -264,9 +265,9 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 80),
+                      SizedBox(height: height * 0.1),
 
-                      // Animated floating title
+                      // Animated floating title - RESPONSIVE
                       AnimatedBuilder(
                         animation: _floatController,
                         builder: (context, child) {
@@ -288,7 +289,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                           child: Text(
                             "Happy Birthday",
                             style: GoogleFonts.greatVibes(
-                              fontSize: 70,
+                              fontSize: width * 0.175,
                               color: Colors.white,
                               shadows: const [
                                 Shadow(
@@ -301,12 +302,12 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                         ),
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: height * 0.012),
 
                       Text(
                         widget.name,
                         style: GoogleFonts.poppins(
-                          fontSize: 32,
+                          fontSize: width * 0.08,
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 3,
@@ -316,9 +317,9 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                         ),
                       ),
 
-                      const SizedBox(height: 40),
+                      SizedBox(height: height * 0.05),
 
-                      // PREMIUM CARD - Enhanced Design
+                      // PREMIUM CARD - RESPONSIVE
                       AnimatedBuilder(
                         animation: _cardPulseAnimation,
                         builder: (context, child) {
@@ -328,10 +329,12 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                           );
                         },
                         child: Container(
-                          width: 360,
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          width: width * 0.9,
+                          margin: EdgeInsets.symmetric(
+                            horizontal: width * 0.05,
+                          ),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(35),
+                            borderRadius: BorderRadius.circular(width * 0.087),
                             gradient: const LinearGradient(
                               colors: [
                                 Color(0xFFFFFFFF),
@@ -344,31 +347,35 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                             boxShadow: [
                               BoxShadow(
                                 color: const Color(0xFFFF69B4).withOpacity(0.4),
-                                blurRadius: 50,
+                                blurRadius: width * 0.125,
                                 spreadRadius: 5,
-                                offset: const Offset(0, 20),
+                                offset: Offset(0, height * 0.025),
                               ),
                               BoxShadow(
                                 color: Colors.orange.withOpacity(0.3),
-                                blurRadius: 40,
+                                blurRadius: width * 0.1,
                                 spreadRadius: -5,
-                                offset: const Offset(0, 15),
+                                offset: Offset(0, height * 0.018),
                               ),
                               BoxShadow(
                                 color: Colors.white.withOpacity(0.9),
-                                blurRadius: 20,
-                                offset: const Offset(-10, -10),
+                                blurRadius: width * 0.05,
+                                offset: Offset(-width * 0.025, -width * 0.025),
                               ),
                             ],
                           ),
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(35),
+                              borderRadius: BorderRadius.circular(
+                                width * 0.087,
+                              ),
                               border: Border.all(width: 3, color: Colors.white),
                             ),
                             child: Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(32),
+                                borderRadius: BorderRadius.circular(
+                                  width * 0.08,
+                                ),
                                 border: Border.all(
                                   width: 2,
                                   color: const Color(
@@ -377,9 +384,11 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                 ),
                               ),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(
+                                  width * 0.075,
+                                ),
                                 child: Container(
-                                  padding: const EdgeInsets.all(35),
+                                  padding: EdgeInsets.all(width * 0.087),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -393,11 +402,11 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                   ),
                                   child: Column(
                                     children: [
-                                      // Decorative top element
+                                      // Decorative top element - RESPONSIVE
                                       Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 25,
-                                          vertical: 8,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: width * 0.062,
+                                          vertical: height * 0.01,
                                         ),
                                         decoration: BoxDecoration(
                                           gradient: const LinearGradient(
@@ -407,22 +416,22 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                             ],
                                           ),
                                           borderRadius: BorderRadius.circular(
-                                            20,
+                                            width * 0.05,
                                           ),
                                           boxShadow: [
                                             BoxShadow(
                                               color: const Color(
                                                 0xFFFF69B4,
                                               ).withOpacity(0.4),
-                                              blurRadius: 15,
-                                              offset: const Offset(0, 5),
+                                              blurRadius: width * 0.037,
+                                              offset: Offset(0, height * 0.006),
                                             ),
                                           ],
                                         ),
                                         child: Text(
                                           "✨ Special Day ✨",
                                           style: GoogleFonts.poppins(
-                                            fontSize: 14,
+                                            fontSize: width * 0.035,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.white,
                                             letterSpacing: 1,
@@ -430,11 +439,11 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                         ),
                                       ),
 
-                                      const SizedBox(height: 25),
+                                      SizedBox(height: height * 0.031),
 
-                                      // Central Lottie Animation - Pink Cake
+                                      // Central Lottie Animation - RESPONSIVE
                                       Container(
-                                        height: 180,
+                                        height: height * 0.22,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           gradient: RadialGradient(
@@ -448,21 +457,21 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                         ),
                                         child: Lottie.asset(
                                           'assets/lottie/pink_cake.json',
-                                          width: 180,
-                                          height: 180,
+                                          width: width * 0.45,
+                                          height: height * 0.22,
                                           fit: BoxFit.contain,
                                         ),
                                       ),
 
-                                      const SizedBox(height: 25),
+                                      SizedBox(height: height * 0.031),
 
-                                      // Message with decorative elements
+                                      // Message with decorative elements - RESPONSIVE
                                       Container(
-                                        padding: const EdgeInsets.all(20),
+                                        padding: EdgeInsets.all(width * 0.05),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFFFF5F7),
                                           borderRadius: BorderRadius.circular(
-                                            20,
+                                            width * 0.05,
                                           ),
                                           border: Border.all(
                                             color: const Color(
@@ -475,7 +484,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                           "I hope your heart smiles today,\nbecause you deserve the world —\nand a little more. ✨💝",
                                           textAlign: TextAlign.center,
                                           style: GoogleFonts.poppins(
-                                            fontSize: 16.5,
+                                            fontSize: width * 0.041,
                                             color: const Color(0xFF333333),
                                             height: 1.8,
                                             fontWeight: FontWeight.w500,
@@ -484,13 +493,13 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                         ),
                                       ),
 
-                                      const SizedBox(height: 30),
+                                      SizedBox(height: height * 0.037),
 
-                                      // Premium Gift Button
+                                      // Premium Gift Button - RESPONSIVE
                                       Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(
-                                            30,
+                                            width * 0.075,
                                           ),
                                           gradient: const LinearGradient(
                                             colors: [
@@ -503,22 +512,22 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                               color: const Color(
                                                 0xFFFF69B4,
                                               ).withOpacity(0.5),
-                                              blurRadius: 20,
-                                              offset: const Offset(0, 10),
+                                              blurRadius: width * 0.05,
+                                              offset: Offset(0, height * 0.012),
                                             ),
                                           ],
                                         ),
                                         child: ElevatedButton.icon(
                                           onPressed: _openLetter,
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.card_giftcard,
-                                            size: 24,
+                                            size: width * 0.06,
                                             color: Colors.white,
                                           ),
                                           label: Text(
                                             "Open Gift 🎁",
                                             style: GoogleFonts.poppins(
-                                              fontSize: 17,
+                                              fontSize: width * 0.042,
                                               fontWeight: FontWeight.w700,
                                               letterSpacing: 0.5,
                                             ),
@@ -527,21 +536,23 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                             foregroundColor: Colors.white,
                                             backgroundColor: Colors.transparent,
                                             shadowColor: Colors.transparent,
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 40,
-                                              vertical: 18,
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: width * 0.1,
+                                              vertical: height * 0.022,
                                             ),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(30),
+                                                  BorderRadius.circular(
+                                                    width * 0.075,
+                                                  ),
                                             ),
                                           ),
                                         ),
                                       ),
 
-                                      const SizedBox(height: 15),
+                                      SizedBox(height: height * 0.018),
 
-                                      // Tap hint with icon
+                                      // Tap hint with icon - RESPONSIVE
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -551,13 +562,13 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                             color: const Color(
                                               0xFFFF69B4,
                                             ).withOpacity(0.7),
-                                            size: 18,
+                                            size: width * 0.045,
                                           ),
-                                          const SizedBox(width: 8),
+                                          SizedBox(width: width * 0.02),
                                           Text(
                                             "Tap anywhere for magic ✨",
                                             style: GoogleFonts.poppins(
-                                              fontSize: 13,
+                                              fontSize: width * 0.032,
                                               color: const Color(0xFF666666),
                                               fontStyle: FontStyle.italic,
                                               fontWeight: FontWeight.w500,
@@ -574,7 +585,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                         ),
                       ),
 
-                      const SizedBox(height: 80),
+                      SizedBox(height: height * 0.1),
                     ],
                   ),
                 ),
@@ -613,8 +624,12 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
     );
   }
 
-  // Animated Letter Overlay
+  // Animated Letter Overlay - RESPONSIVE
   Widget _buildLetterOverlay() {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
     return AnimatedBuilder(
       animation: _letterController,
       builder: (context, child) {
@@ -633,27 +648,23 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
             // Animated Letter
             Center(
               child: Transform.translate(
-                offset: Offset(
-                  0,
-                  MediaQuery.of(context).size.height *
-                      _letterSlideAnimation.value,
-                ),
+                offset: Offset(0, height * _letterSlideAnimation.value),
                 child: Transform.rotate(
                   angle: _letterRotateAnimation.value,
                   child: Transform.scale(
                     scale: _letterScaleAnimation.value,
                     child: Container(
-                      width: 360,
-                      height: 520,
-                      margin: const EdgeInsets.all(20),
+                      width: width * 0.9,
+                      height: height * 0.65,
+                      margin: EdgeInsets.all(width * 0.05),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFF8E7),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(width * 0.05),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.5),
-                            blurRadius: 40,
-                            offset: const Offset(0, 15),
+                            blurRadius: width * 0.1,
+                            offset: Offset(0, height * 0.018),
                           ),
                         ],
                       ),
@@ -662,61 +673,63 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                           // Decorative Border Pattern
                           Positioned.fill(
                             child: Container(
-                              margin: const EdgeInsets.all(20),
+                              margin: EdgeInsets.all(width * 0.05),
                               decoration: BoxDecoration(
                                 border: Border.all(
                                   color: const Color(0xFFFFC0CB),
                                   width: 3,
                                 ),
-                                borderRadius: BorderRadius.circular(15),
+                                borderRadius: BorderRadius.circular(
+                                  width * 0.037,
+                                ),
                               ),
                             ),
                           ),
 
                           // Letter Content
                           Padding(
-                            padding: const EdgeInsets.all(40),
+                            padding: EdgeInsets.all(width * 0.1),
                             child: Column(
                               children: [
-                                // Decorative hearts at top
-                                const Row(
+                                // Decorative hearts at top - RESPONSIVE
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
                                       Icons.favorite,
-                                      color: Color(0xFFFF69B4),
-                                      size: 22,
+                                      color: const Color(0xFFFF69B4),
+                                      size: width * 0.055,
                                     ),
-                                    SizedBox(width: 10),
+                                    SizedBox(width: width * 0.025),
                                     Icon(
                                       Icons.favorite,
-                                      color: Color(0xFFFFC0CB),
-                                      size: 18,
+                                      color: const Color(0xFFFFC0CB),
+                                      size: width * 0.045,
                                     ),
-                                    SizedBox(width: 10),
+                                    SizedBox(width: width * 0.025),
                                     Icon(
                                       Icons.favorite,
-                                      color: Color(0xFFFF69B4),
-                                      size: 22,
+                                      color: const Color(0xFFFF69B4),
+                                      size: width * 0.055,
                                     ),
                                   ],
                                 ),
 
-                                const SizedBox(height: 25),
+                                SizedBox(height: height * 0.031),
 
-                                // Greeting
+                                // Greeting - RESPONSIVE
                                 Text(
                                   "Dear ${widget.name},",
                                   style: GoogleFonts.dancingScript(
-                                    fontSize: 32,
+                                    fontSize: width * 0.08,
                                     fontWeight: FontWeight.bold,
                                     color: const Color(0xFFD14D72),
                                   ),
                                 ),
 
-                                const SizedBox(height: 25),
+                                SizedBox(height: height * 0.031),
 
-                                // Message content
+                                // Message content - RESPONSIVE
                                 Expanded(
                                   child: SingleChildScrollView(
                                     child: Text(
@@ -726,7 +739,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                       "With all my love and warm wishes,\nHappy Birthday! 🎂✨💝",
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.poppins(
-                                        fontSize: 15,
+                                        fontSize: width * 0.037,
                                         color: const Color(0xFF654321),
                                         height: 1.8,
                                         letterSpacing: 0.3,
@@ -735,26 +748,28 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                   ),
                                 ),
 
-                                const SizedBox(height: 25),
+                                SizedBox(height: height * 0.031),
 
-                                // Close Button
+                                // Close Button - RESPONSIVE
                                 ElevatedButton(
                                   onPressed: _closeLetter,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFFF69B4),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 50,
-                                      vertical: 14,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: width * 0.125,
+                                      vertical: height * 0.017,
                                     ),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25),
+                                      borderRadius: BorderRadius.circular(
+                                        width * 0.062,
+                                      ),
                                     ),
                                     elevation: 8,
                                   ),
                                   child: Text(
                                     "Close Letter 💌",
                                     style: GoogleFonts.poppins(
-                                      fontSize: 16,
+                                      fontSize: width * 0.04,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                     ),
@@ -776,8 +791,12 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
     );
   }
 
-  // Floating Hearts
+  // Floating Hearts - RESPONSIVE
   Widget _floatingParticles(int i) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
     return TweenAnimationBuilder<double>(
       key: ValueKey('heart_$i'),
       tween: Tween(begin: 1, end: 0),
@@ -787,8 +806,8 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
       },
       builder: (context, value, child) {
         return Positioned(
-          left: (i * 60) % MediaQuery.of(context).size.width,
-          bottom: -30 + (MediaQuery.of(context).size.height * (1 - value)),
+          left: (i * 60) % width,
+          bottom: -30 + (height * (1 - value)),
           child: Opacity(
             opacity: value * 0.7,
             child: Transform.rotate(
@@ -802,7 +821,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                       const Color(0xFFDDA0DD),
                       const Color(0xFFFFB347),
                     ][i % 4],
-                size: 15 + (i % 10).toDouble(),
+                size: width * 0.037 + (i % 10).toDouble(),
               ),
             ),
           ),

@@ -31,7 +31,6 @@ class _IntroScreenState extends State<IntroScreen>
   late Animation<double> _blastAnimation;
   late Animation<double> _cardPulseAnimation;
 
-  // Timer countdown
   int _remainingSeconds = 10;
   Timer? _countdownTimer;
   bool _isBlasting = false;
@@ -172,6 +171,16 @@ class _IntroScreenState extends State<IntroScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    // Responsive scaling factors
+    final cardWidth = width * 0.9;
+    final cardPadding = width * 0.08;
+    final ledHeight = height * 0.07;
+    final ledSize = width * 0.04;
+
     return Scaffold(
       body: GestureDetector(
         onTap: _remainingSeconds > 0 ? null : _triggerBlast,
@@ -204,7 +213,7 @@ class _IntroScreenState extends State<IntroScreen>
               },
             ),
 
-            // LED Lights on top
+            // LED Lights on top - RESPONSIVE
             Positioned(
               top: 0,
               left: 0,
@@ -213,7 +222,7 @@ class _IntroScreenState extends State<IntroScreen>
                 animation: _ledController,
                 builder: (context, child) {
                   return Container(
-                    height: 60,
+                    height: ledHeight,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: List.generate(15, (index) {
@@ -222,8 +231,8 @@ class _IntroScreenState extends State<IntroScreen>
                         final opacity =
                             (math.sin(offset * math.pi * 2) + 1) / 2;
                         return Container(
-                          width: 15,
-                          height: 15,
+                          width: ledSize,
+                          height: ledSize,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: [
@@ -242,7 +251,7 @@ class _IntroScreenState extends State<IntroScreen>
                                   Colors.blue,
                                   Colors.purple,
                                 ][index % 5].withOpacity(opacity),
-                                blurRadius: 15,
+                                blurRadius: width * 0.04,
                                 spreadRadius: 2,
                               ),
                             ],
@@ -293,7 +302,7 @@ class _IntroScreenState extends State<IntroScreen>
                 },
               ),
 
-            // Main content with PREMIUM CARD
+            // Main content with PREMIUM CARD - RESPONSIVE
             Center(
               child: LayoutBuilder(
                 builder: (context, constraints) {
@@ -309,7 +318,7 @@ class _IntroScreenState extends State<IntroScreen>
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // PREMIUM CARD CONTAINER
+                              // PREMIUM CARD CONTAINER - RESPONSIVE
                               AnimatedBuilder(
                                 animation: _cardPulseAnimation,
                                 builder: (context, child) {
@@ -319,12 +328,14 @@ class _IntroScreenState extends State<IntroScreen>
                                   );
                                 },
                                 child: Container(
-                                  width: 390,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 20,
+                                  width: cardWidth,
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: width * 0.05,
                                   ),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
+                                    borderRadius: BorderRadius.circular(
+                                      width * 0.1,
+                                    ),
                                     gradient: const LinearGradient(
                                       colors: [
                                         Color(0xFFFFFFFF),
@@ -339,32 +350,37 @@ class _IntroScreenState extends State<IntroScreen>
                                         color: const Color(
                                           0xFFFF69B4,
                                         ).withOpacity(0.6),
-                                        blurRadius: 60,
+                                        blurRadius: width * 0.15,
                                         spreadRadius: 8,
-                                        offset: const Offset(0, 25),
+                                        offset: Offset(0, height * 0.03),
                                       ),
                                       BoxShadow(
                                         color: Colors.orange.withOpacity(0.4),
-                                        blurRadius: 50,
+                                        blurRadius: width * 0.12,
                                         spreadRadius: -5,
-                                        offset: const Offset(0, 20),
+                                        offset: Offset(0, height * 0.025),
                                       ),
                                       BoxShadow(
                                         color: Colors.purple.withOpacity(0.3),
-                                        blurRadius: 40,
+                                        blurRadius: width * 0.1,
                                         spreadRadius: -10,
-                                        offset: const Offset(0, 15),
+                                        offset: Offset(0, height * 0.018),
                                       ),
                                       BoxShadow(
                                         color: Colors.white.withOpacity(0.9),
-                                        blurRadius: 25,
-                                        offset: const Offset(-12, -12),
+                                        blurRadius: width * 0.06,
+                                        offset: Offset(
+                                          -width * 0.03,
+                                          -width * 0.03,
+                                        ),
                                       ),
                                     ],
                                   ),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(40),
+                                      borderRadius: BorderRadius.circular(
+                                        width * 0.1,
+                                      ),
                                       border: Border.all(
                                         width: 3,
                                         color: Colors.white,
@@ -372,7 +388,9 @@ class _IntroScreenState extends State<IntroScreen>
                                     ),
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(37),
+                                        borderRadius: BorderRadius.circular(
+                                          width * 0.092,
+                                        ),
                                         border: Border.all(
                                           width: 2,
                                           color: const Color(
@@ -381,9 +399,11 @@ class _IntroScreenState extends State<IntroScreen>
                                         ),
                                       ),
                                       child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(35),
+                                        borderRadius: BorderRadius.circular(
+                                          width * 0.087,
+                                        ),
                                         child: Container(
-                                          padding: const EdgeInsets.all(40),
+                                          padding: EdgeInsets.all(cardPadding),
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
                                               colors: [
@@ -397,13 +417,12 @@ class _IntroScreenState extends State<IntroScreen>
                                           ),
                                           child: Column(
                                             children: [
-                                              // Premium Top Badge
+                                              // Premium Top Badge - RESPONSIVE
                                               Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 28,
-                                                      vertical: 10,
-                                                    ),
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: width * 0.07,
+                                                  vertical: height * 0.012,
+                                                ),
                                                 decoration: BoxDecoration(
                                                   gradient:
                                                       const LinearGradient(
@@ -414,16 +433,18 @@ class _IntroScreenState extends State<IntroScreen>
                                                         ],
                                                       ),
                                                   borderRadius:
-                                                      BorderRadius.circular(25),
+                                                      BorderRadius.circular(
+                                                        width * 0.06,
+                                                      ),
                                                   boxShadow: [
                                                     BoxShadow(
                                                       color: const Color(
                                                         0xFFFF69B4,
                                                       ).withOpacity(0.5),
-                                                      blurRadius: 20,
-                                                      offset: const Offset(
+                                                      blurRadius: width * 0.05,
+                                                      offset: Offset(
                                                         0,
-                                                        8,
+                                                        height * 0.01,
                                                       ),
                                                     ),
                                                   ],
@@ -432,17 +453,20 @@ class _IntroScreenState extends State<IntroScreen>
                                                   mainAxisSize:
                                                       MainAxisSize.min,
                                                   children: [
-                                                    const Icon(
+                                                    Icon(
                                                       Icons.celebration,
                                                       color: Colors.white,
-                                                      size: 20,
+                                                      size: width * 0.05,
                                                     ),
-                                                    const SizedBox(width: 8),
+                                                    SizedBox(
+                                                      width: width * 0.02,
+                                                    ),
                                                     Text(
                                                       "✨ Count Down ✨",
                                                       style:
                                                           GoogleFonts.poppins(
-                                                            fontSize: 15,
+                                                            fontSize:
+                                                                width * 0.038,
                                                             fontWeight:
                                                                 FontWeight.w700,
                                                             color: Colors.white,
@@ -453,15 +477,14 @@ class _IntroScreenState extends State<IntroScreen>
                                                 ),
                                               ),
 
-                                              const SizedBox(height: 30),
+                                              SizedBox(height: height * 0.035),
 
-                                              // Countdown Timer - Premium Style
+                                              // Countdown Timer - RESPONSIVE
                                               Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 35,
-                                                      vertical: 20,
-                                                    ),
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: width * 0.087,
+                                                  vertical: height * 0.024,
+                                                ),
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
                                                     colors: [
@@ -474,7 +497,9 @@ class _IntroScreenState extends State<IntroScreen>
                                                     end: Alignment.bottomRight,
                                                   ),
                                                   borderRadius:
-                                                      BorderRadius.circular(30),
+                                                      BorderRadius.circular(
+                                                        width * 0.075,
+                                                      ),
                                                   border: Border.all(
                                                     color: const Color(
                                                       0xFFFFB3C1,
@@ -486,10 +511,10 @@ class _IntroScreenState extends State<IntroScreen>
                                                       color: const Color(
                                                         0xFFFF69B4,
                                                       ).withOpacity(0.2),
-                                                      blurRadius: 15,
-                                                      offset: const Offset(
+                                                      blurRadius: width * 0.037,
+                                                      offset: Offset(
                                                         0,
-                                                        5,
+                                                        height * 0.006,
                                                       ),
                                                     ),
                                                   ],
@@ -499,10 +524,9 @@ class _IntroScreenState extends State<IntroScreen>
                                                       MainAxisSize.min,
                                                   children: [
                                                     Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                            10,
-                                                          ),
+                                                      padding: EdgeInsets.all(
+                                                        width * 0.025,
+                                                      ),
                                                       decoration: BoxDecoration(
                                                         gradient:
                                                             const LinearGradient(
@@ -521,18 +545,21 @@ class _IntroScreenState extends State<IntroScreen>
                                                             color: const Color(
                                                               0xFFFF69B4,
                                                             ).withOpacity(0.4),
-                                                            blurRadius: 10,
+                                                            blurRadius:
+                                                                width * 0.025,
                                                             spreadRadius: 2,
                                                           ),
                                                         ],
                                                       ),
-                                                      child: const Icon(
+                                                      child: Icon(
                                                         Icons.timer,
                                                         color: Colors.white,
-                                                        size: 28,
+                                                        size: width * 0.07,
                                                       ),
                                                     ),
-                                                    const SizedBox(width: 15),
+                                                    SizedBox(
+                                                      width: width * 0.037,
+                                                    ),
                                                     AnimatedBuilder(
                                                       animation:
                                                           _shimmerController,
@@ -570,7 +597,9 @@ class _IntroScreenState extends State<IntroScreen>
                                                             '00:${_remainingSeconds.toString().padLeft(2, '0')}',
                                                             style:
                                                                 GoogleFonts.orbitron(
-                                                                  fontSize: 40,
+                                                                  fontSize:
+                                                                      width *
+                                                                      0.1,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .w900,
@@ -588,9 +617,9 @@ class _IntroScreenState extends State<IntroScreen>
                                                 ),
                                               ),
 
-                                              const SizedBox(height: 35),
+                                              SizedBox(height: height * 0.04),
 
-                                              // Gift emoji animation with premium circle
+                                              // Gift emoji - RESPONSIVE
                                               AnimatedBuilder(
                                                 animation: _pulseAnimation,
                                                 builder: (context, child) {
@@ -598,10 +627,9 @@ class _IntroScreenState extends State<IntroScreen>
                                                     scale:
                                                         _pulseAnimation.value,
                                                     child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                            30,
-                                                          ),
+                                                      padding: EdgeInsets.all(
+                                                        width * 0.075,
+                                                      ),
                                                       decoration: BoxDecoration(
                                                         shape: BoxShape.circle,
                                                         gradient: RadialGradient(
@@ -625,20 +653,23 @@ class _IntroScreenState extends State<IntroScreen>
                                                                       .value,
                                                             ),
                                                             blurRadius:
-                                                                40 *
+                                                                width *
+                                                                0.1 *
                                                                 _pulseAnimation
                                                                     .value,
                                                             spreadRadius:
-                                                                10 *
+                                                                width *
+                                                                0.025 *
                                                                 _pulseAnimation
                                                                     .value,
                                                           ),
                                                         ],
                                                       ),
-                                                      child: const Text(
+                                                      child: Text(
                                                         '🎁',
                                                         style: TextStyle(
-                                                          fontSize: 100,
+                                                          fontSize:
+                                                              width * 0.25,
                                                         ),
                                                       ),
                                                     ),
@@ -646,9 +677,9 @@ class _IntroScreenState extends State<IntroScreen>
                                                 },
                                               ),
 
-                                              const SizedBox(height: 35),
+                                              SizedBox(height: height * 0.04),
 
-                                              // Main text with shimmer effect
+                                              // Main text - RESPONSIVE
                                               ShaderMask(
                                                 shaderCallback: (bounds) {
                                                   return LinearGradient(
@@ -663,7 +694,7 @@ class _IntroScreenState extends State<IntroScreen>
                                                   'Something Special\nIs Coming...',
                                                   textAlign: TextAlign.center,
                                                   style: GoogleFonts.greatVibes(
-                                                    fontSize: 48,
+                                                    fontSize: width * 0.12,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.white,
                                                     height: 1.3,
@@ -671,15 +702,14 @@ class _IntroScreenState extends State<IntroScreen>
                                                 ),
                                               ),
 
-                                              const SizedBox(height: 25),
+                                              SizedBox(height: height * 0.03),
 
-                                              // Bottom message box
+                                              // Bottom message - RESPONSIVE
                                               Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 30,
-                                                      vertical: 15,
-                                                    ),
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: width * 0.075,
+                                                  vertical: height * 0.018,
+                                                ),
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
                                                     colors: [
@@ -690,7 +720,9 @@ class _IntroScreenState extends State<IntroScreen>
                                                     ],
                                                   ),
                                                   borderRadius:
-                                                      BorderRadius.circular(25),
+                                                      BorderRadius.circular(
+                                                        width * 0.062,
+                                                      ),
                                                   border: Border.all(
                                                     color: const Color(
                                                       0xFFFFB3C1,
@@ -702,18 +734,21 @@ class _IntroScreenState extends State<IntroScreen>
                                                   mainAxisSize:
                                                       MainAxisSize.min,
                                                   children: [
-                                                    const Text(
+                                                    Text(
                                                       '🎉',
                                                       style: TextStyle(
-                                                        fontSize: 20,
+                                                        fontSize: width * 0.05,
                                                       ),
                                                     ),
-                                                    const SizedBox(width: 10),
+                                                    SizedBox(
+                                                      width: width * 0.025,
+                                                    ),
                                                     Text(
                                                       'Get ready!',
                                                       style:
                                                           GoogleFonts.poppins(
-                                                            fontSize: 18,
+                                                            fontSize:
+                                                                width * 0.045,
                                                             color: const Color(
                                                               0xFFFF1493,
                                                             ),
@@ -722,11 +757,13 @@ class _IntroScreenState extends State<IntroScreen>
                                                             letterSpacing: 0.5,
                                                           ),
                                                     ),
-                                                    const SizedBox(width: 10),
-                                                    const Text(
+                                                    SizedBox(
+                                                      width: width * 0.025,
+                                                    ),
+                                                    Text(
                                                       '🎉',
                                                       style: TextStyle(
-                                                        fontSize: 20,
+                                                        fontSize: width * 0.05,
                                                       ),
                                                     ),
                                                   ],
@@ -775,14 +812,15 @@ class _IntroScreenState extends State<IntroScreen>
   }
 
   Widget _buildFloatingEmoji(int index) {
+    final size = MediaQuery.of(context).size;
     final emojis = ['❤️', '💝', '🎁', '🎈', '⭐', '💖', '🎉', '✨'];
     final random = index * 47;
     final left = (random % 100).toDouble();
     final duration = 4 + (random % 5);
-    final size = 25.0 + (random % 20).toDouble();
+    final emojiSize = size.width * 0.06 + (random % 20).toDouble();
 
     return Positioned(
-      left: MediaQuery.of(context).size.width * (left / 100),
+      left: size.width * (left / 100),
       bottom: -50,
       child: TweenAnimationBuilder(
         key: ValueKey('emoji_$index'),
@@ -795,7 +833,7 @@ class _IntroScreenState extends State<IntroScreen>
           return Transform.translate(
             offset: Offset(
               30 * math.sin(value * math.pi * 2) * (index % 2 == 0 ? 1 : -1),
-              -MediaQuery.of(context).size.height * 1.2 * value,
+              -size.height * 1.2 * value,
             ),
             child: Transform.rotate(
               angle: value * math.pi * 4,
@@ -804,7 +842,7 @@ class _IntroScreenState extends State<IntroScreen>
                 child: Text(
                   emojis[index % emojis.length],
                   style: TextStyle(
-                    fontSize: size,
+                    fontSize: emojiSize,
                     shadows: [
                       Shadow(
                         color: Colors.white.withOpacity(0.5),
@@ -822,7 +860,6 @@ class _IntroScreenState extends State<IntroScreen>
   }
 }
 
-// Custom painter for sparkle effect
 class SparklePainter extends CustomPainter {
   final Animation<double> animation;
 
