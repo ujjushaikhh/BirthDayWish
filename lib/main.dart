@@ -17,6 +17,7 @@ class BirthdaySurpriseApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         textTheme: GoogleFonts.poppinsTextTheme(),
+        useMaterial3: true,
       ),
       home: const IntroScreen(),
     );

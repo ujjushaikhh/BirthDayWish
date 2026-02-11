@@ -6,8 +6,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:lottie/lottie.dart';
 
 class WishScreen extends StatefulWidget {
-  final String name;
-  const WishScreen({super.key, this.name = "My Love"});
+  const WishScreen({super.key});
 
   @override
   State<WishScreen> createState() => _WishScreenState();
@@ -19,10 +18,12 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
   late AnimationController _floatController;
   late AnimationController _letterController;
   late AnimationController _cardPulseController;
+  late AnimationController _buttonPressController;
   late Animation<double> _letterSlideAnimation;
   late Animation<double> _letterRotateAnimation;
   late Animation<double> _letterScaleAnimation;
   late Animation<double> _cardPulseAnimation;
+  late Animation<double> _buttonPressAnimation;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool showMain = false;
@@ -55,6 +56,11 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
       vsync: this,
     )..repeat(reverse: true);
 
+    _buttonPressController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+
     _letterSlideAnimation = Tween<double>(begin: 1.5, end: 0.0).animate(
       CurvedAnimation(
         parent: _letterController,
@@ -80,6 +86,13 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
       CurvedAnimation(parent: _cardPulseController, curve: Curves.easeInOut),
     );
 
+    _buttonPressAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
+      CurvedAnimation(
+        parent: _buttonPressController,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
         setState(() => showMain = true);
@@ -101,6 +114,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
     _floatController.dispose();
     _letterController.dispose();
     _cardPulseController.dispose();
+    _buttonPressController.dispose();
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -117,6 +131,9 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
   }
 
   void _openLetter() {
+    _buttonPressController.forward().then((_) {
+      _buttonPressController.reverse();
+    });
     setState(() => showLetter = true);
     _letterController.forward();
   }
@@ -133,7 +150,6 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final height = size.height;
 
     // Determine if desktop/tablet
     final isDesktop = width > 900;
@@ -152,10 +168,10 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: const [
-                        Color(0xFFff9a9e),
-                        Color(0xFFfad0c4),
-                        Color(0xFFffeaa7),
-                        Color(0xFFfcb69f),
+                        Color(0xFFE85B8A),
+                        Color(0xFFF5A39B),
+                        Color(0xFFFDC896),
+                        Color(0xFFF5A39B),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -277,7 +293,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(height: isDesktop ? 60 : 80),
+                          // SizedBox(height: isDesktop ? 60 : 80),
 
                           // Animated floating title
                           AnimatedBuilder(
@@ -318,10 +334,12 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                           const SizedBox(height: 10),
 
                           Text(
-                            widget.name,
+                            textAlign: TextAlign.center,
+                            "(Selenophile, رُوح, Bebo, Feriha)",
                             style: GoogleFonts.poppins(
-                              fontSize: isDesktop ? 38 : (isTablet ? 34 : 32),
+                              fontSize: isDesktop ? 38 : (isTablet ? 34 : 28),
                               color: Colors.white,
+
                               fontWeight: FontWeight.w700,
                               letterSpacing: 3,
                               shadows: const [
@@ -342,7 +360,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                               );
                             },
                             child: Padding(
-                              padding: const EdgeInsets.all(24.0),
+                              padding: const EdgeInsets.all(16.0),
                               child: Container(
                                 width:
                                     isDesktop
@@ -365,14 +383,14 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                   boxShadow: [
                                     BoxShadow(
                                       color: const Color(
-                                        0xFFFF69B4,
-                                      ).withOpacity(0.4),
+                                        0xFFE85B8A,
+                                      ).withOpacity(0.35),
                                       blurRadius: 50,
-                                      spreadRadius: 5,
+                                      spreadRadius: 3,
                                       offset: const Offset(0, 20),
                                     ),
                                     BoxShadow(
-                                      color: Colors.orange.withOpacity(0.3),
+                                      color: Colors.orange.withOpacity(0.2),
                                       blurRadius: 40,
                                       spreadRadius: -5,
                                       offset: const Offset(0, 15),
@@ -398,7 +416,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                       border: Border.all(
                                         width: 2,
                                         color: const Color(
-                                          0xFFFFB3C1,
+                                          0xFFF5A8C6,
                                         ).withOpacity(0.3),
                                       ),
                                     ),
@@ -489,18 +507,18 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                                 isDesktop ? 22 : 20,
                                               ),
                                               decoration: BoxDecoration(
-                                                color: const Color(0xFFFFF5F7),
+                                                color: const Color(0xFFFFF9FB),
                                                 borderRadius:
                                                     BorderRadius.circular(20),
                                                 border: Border.all(
                                                   color: const Color(
-                                                    0xFFFFB3C1,
-                                                  ).withOpacity(0.3),
+                                                    0xFFF5A8C6,
+                                                  ).withOpacity(0.25),
                                                   width: 1.5,
                                                 ),
                                               ),
                                               child: Text(
-                                                "I hope your heart smiles today,\nbecause you deserve the world and a little more.",
+                                                '''I hope today reminds you how Special you truly are. Not just because it’s your Birthday,but because of the Kind of Person you are. \nMay this year bring you Peace, Clarity, Growth, and Genuine Happiness.\nKeep Shining like you do Always.''',
                                                 textAlign: TextAlign.center,
                                                 style:
                                                     GoogleFonts.dancingScript(
@@ -526,60 +544,71 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                             ),
 
                                             // Gift Button
-                                            Container(
-                                              width: size.width,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(30),
-                                                gradient: const LinearGradient(
-                                                  colors: [
-                                                    Color(0xFFFF69B4),
-                                                    Color(0xFFFF8FB4),
+                                            AnimatedBuilder(
+                                              animation: _buttonPressAnimation,
+                                              builder: (context, child) {
+                                                return Transform.scale(
+                                                  scale:
+                                                      _buttonPressAnimation
+                                                          .value,
+                                                  child: child,
+                                                );
+                                              },
+                                              child: Container(
+                                                width: size.width,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                  gradient:
+                                                      const LinearGradient(
+                                                        colors: [
+                                                          Color(0xFFE85B8A),
+                                                          Color(0xFFF18BA0),
+                                                        ],
+                                                      ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: const Color(
+                                                        0xFFE85B8A,
+                                                      ).withOpacity(0.4),
+                                                      blurRadius: 20,
+                                                      offset: const Offset(
+                                                        0,
+                                                        10,
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: const Color(
-                                                      0xFFFF69B4,
-                                                    ).withOpacity(0.5),
-                                                    blurRadius: 20,
-                                                    offset: const Offset(0, 10),
+                                                child: ElevatedButton.icon(
+                                                  onPressed: _openLetter,
+                                                  icon: Icon(
+                                                    Icons.card_giftcard,
+                                                    size: isDesktop ? 26 : 20,
+                                                    color: Colors.white,
                                                   ),
-                                                ],
-                                              ),
-                                              child: ElevatedButton.icon(
-                                                onPressed: _openLetter,
-                                                icon: Icon(
-                                                  Icons.card_giftcard,
-                                                  size: isDesktop ? 26 : 20,
-                                                  color: Colors.white,
-                                                ),
-                                                label: Text(
-                                                  "Open Gift 🎁",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize:
-                                                        isDesktop ? 18 : 14,
-                                                    fontWeight: FontWeight.bold,
-                                                    letterSpacing: 0.5,
+                                                  label: Text(
+                                                    "Open Gift 🎁",
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize:
+                                                          isDesktop ? 18 : 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      letterSpacing: 0.5,
+                                                    ),
                                                   ),
-                                                ),
-                                                style: ElevatedButton.styleFrom(
-                                                  foregroundColor: Colors.white,
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  shadowColor:
-                                                      Colors.transparent,
-                                                  // padding: EdgeInsets.symmetric(
-                                                  //   horizontal:
-                                                  //       isDesktop ? 45 : 40,
-                                                  //   vertical:
-                                                  //       isDesktop ? 20 : 18,
-                                                  // ),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          30,
-                                                        ),
+                                                  style: ElevatedButton.styleFrom(
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    shadowColor:
+                                                        Colors.transparent,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            30,
+                                                          ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -597,8 +626,8 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                                 Icon(
                                                   Icons.touch_app,
                                                   color: const Color(
-                                                    0xFFFF69B4,
-                                                  ).withOpacity(0.7),
+                                                    0xFFE85B8A,
+                                                  ).withOpacity(0.6),
                                                   size: isDesktop ? 20 : 18,
                                                 ),
                                                 const SizedBox(width: 8),
@@ -724,7 +753,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                               margin: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: const Color(0xFFFFC0CB),
+                                  color: const Color(0xFFF5A8C6),
                                   width: 3,
                                 ),
                                 borderRadius: BorderRadius.circular(15),
@@ -740,46 +769,60 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                   children: [
                                     Icon(
                                       Icons.favorite,
-                                      color: Color(0xFFFF69B4),
+                                      color: Color(0xFFE85B8A),
                                       size: 22,
                                     ),
                                     SizedBox(width: 10),
                                     Icon(
                                       Icons.favorite,
-                                      color: Color(0xFFFFC0CB),
+                                      color: Color(0xFFF5A8C6),
                                       size: 18,
                                     ),
                                     SizedBox(width: 10),
                                     Icon(
                                       Icons.favorite,
-                                      color: Color(0xFFFF69B4),
+                                      color: Color(0xFFE85B8A),
                                       size: 22,
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 25),
-                                Text(
-                                  "Dear ${widget.name},",
-                                  style: GoogleFonts.dancingScript(
-                                    fontSize: isDesktop ? 34 : 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFFD14D72),
+                                AnimatedOpacity(
+                                  opacity:
+                                      _letterController.value > 0.6
+                                          ? (_letterController.value - 0.6) /
+                                              0.4
+                                          : 0.0,
+                                  duration: Duration.zero,
+                                  child: Text(
+                                    "Dear Bestiee,",
+                                    style: GoogleFonts.dancingScript(
+                                      fontSize: isDesktop ? 34 : 32,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFFD6347D),
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 25),
                                 Expanded(
                                   child: SingleChildScrollView(
-                                    child: Text(
-                                      "On this special day, I want you to know how incredibly amazing you are. Your smile lights up every room, your kindness touches every heart, and your presence makes the world a better place.\n\n"
-                                      "May this year bring you countless reasons to smile, endless opportunities to grow, and beautiful moments that take your breath away.\n\n"
-                                      "You deserve all the happiness in the universe and more. Keep shining, keep smiling, and never forget how truly special you are!\n\n"
-                                      "With all my love and warm wishes,\nHappy Birthday! 🎂✨💝",
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: isDesktop ? 16 : 15,
-                                        color: const Color(0xFF654321),
-                                        height: 1.8,
-                                        letterSpacing: 0.3,
+                                    child: AnimatedOpacity(
+                                      opacity:
+                                          _letterController.value > 0.6
+                                              ? (_letterController.value -
+                                                      0.6) /
+                                                  0.4
+                                              : 0.0,
+                                      duration: Duration.zero,
+                                      child: Text(
+                                        '''On your birthday, I just want to say that you’ve always been someone meaningful in my life.Not everyone gets to share years of memories, conversations, laughter, and growth together — and I genuinely value that ✨ Life changes, people grow,…\n but some connections leave a quiet impact that never really fades 🌙.\n I sincerely pray that this year brings you emotional peace, strength, success, and moments that make your heart feel light again 💫.\n May you always find comfort in yourself, confidence in your journey, and happiness that doesn’t depend on anyone else 🌸 \nStay kind. \nStay strong.\nStay the beautiful soul you are.🤍\nHappy Birthday 🎂✨''',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: isDesktop ? 16 : 15,
+                                          color: const Color(0xFF654321),
+                                          height: 1.8,
+                                          letterSpacing: 0.3,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -788,7 +831,7 @@ class _WishScreenState extends State<WishScreen> with TickerProviderStateMixin {
                                 ElevatedButton(
                                   onPressed: _closeLetter,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFFF69B4),
+                                    backgroundColor: const Color(0xFFE85B8A),
                                     padding: EdgeInsets.symmetric(
                                       horizontal: isDesktop ? 55 : 50,
                                       vertical: isDesktop ? 16 : 14,

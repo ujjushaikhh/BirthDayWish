@@ -31,9 +31,10 @@ class _IntroScreenState extends State<IntroScreen>
   late Animation<double> _blastAnimation;
   late Animation<double> _cardPulseAnimation;
 
-  int _remainingSeconds = 10;
+  int _remainingSeconds = 15;
   Timer? _countdownTimer;
   bool _isBlasting = false;
+  final AudioPlayer _tickPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -81,14 +82,14 @@ class _IntroScreenState extends State<IntroScreen>
     _scaleAnimation = Tween<double>(
       begin: 0.5,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     _opacityAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInCubic));
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
@@ -97,26 +98,88 @@ class _IntroScreenState extends State<IntroScreen>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _blastController, curve: Curves.easeOut));
 
-    _cardPulseAnimation = Tween<double>(begin: 1.0, end: 1.03).animate(
+    _cardPulseAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
       CurvedAnimation(parent: _cardPulseController, curve: Curves.easeInOut),
     );
 
     _controller.forward();
-    _startCountdown();
+    final now = DateTime.now();
+    _isUnlocked = !now.isBefore(unlockDate);
+
+    // _controller.forward();
+
+    if (_isUnlocked) {
+      _startCountdown(); // existing behavior
+    } else {
+      _startLockedCountdown();
+    }
   }
 
-  void _startCountdown() {
+  String get formattedRemainingTime {
+    final d = Duration(seconds: _remainingSeconds);
+
+    final minutes = d.inMinutes.remainder(60);
+    final seconds = d.inSeconds.remainder(60);
+
+    return '${minutes.toString().padLeft(2, '0')}M :'
+        '${seconds.toString().padLeft(2, '0')} S ';
+  }
+
+  void _startLockedCountdown() {
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final now = DateTime.now();
+      final diff = unlockDate.difference(now);
+
+      if (diff.isNegative) {
+        timer.cancel();
+        setState(() => _isUnlocked = true);
+        _startCountdown(); // switch to normal behavior
+        return;
+      }
+
+      setState(() {
+        _remainingSeconds = diff.inSeconds;
+      });
+    });
+  }
+
+  final DateTime unlockDate = DateTime(2026, 2, 10);
+  bool _isUnlocked = false;
+
+  void _startCountdown() {
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (_remainingSeconds > 0) {
         setState(() {
           _remainingSeconds--;
         });
+
+        // 🔊 tick sound
+        try {
+          await _tickPlayer.stop();
+          await _tickPlayer.play(
+            AssetSource('audio/tick.mp3'),
+            volume: 0.4, // soft, not annoying
+          );
+        } catch (_) {}
       } else {
         timer.cancel();
         _triggerBlast();
       }
     });
   }
+
+  // void _startCountdown() {
+  //   _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+  //     if (_remainingSeconds > 0) {
+  //       setState(() {
+  //         _remainingSeconds--;
+  //       });
+  //     } else {
+  //       timer.cancel();
+  //       _triggerBlast();
+  //     }
+  //   });
+  // }
 
   void _triggerBlast() async {
     setState(() => _isBlasting = true);
@@ -144,6 +207,7 @@ class _IntroScreenState extends State<IntroScreen>
     _blastController.dispose();
     _cardPulseController.dispose();
     _shimmerController.dispose();
+    _tickPlayer.dispose();
     _confettiController.dispose();
     _audioPlayer.dispose();
     super.dispose();
@@ -152,21 +216,35 @@ class _IntroScreenState extends State<IntroScreen>
   void _navigateToWish() {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder:
-            (context, animation, secondaryAnimation) =>
-                const WishScreen(name: "Beautiful"),
+        pageBuilder: (context, animation, secondaryAnimation) => WishScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final tweenSequence = TweenSequence<double>([
+            TweenSequenceItem(
+              tween: Tween<double>(
+                begin: 1.0,
+                end: 0.95,
+              ).chain(CurveTween(curve: Curves.easeInCubic)),
+              weight: 30,
+            ),
+            TweenSequenceItem(
+              tween: Tween<double>(
+                begin: 0.95,
+                end: 1.0,
+              ).chain(CurveTween(curve: Curves.easeOutCubic)),
+              weight: 70,
+            ),
+          ]);
           return FadeTransition(
-            opacity: animation,
+            opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
+            ),
             child: ScaleTransition(
-              scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                CurvedAnimation(parent: animation, curve: Curves.easeOut),
-              ),
+              scale: tweenSequence.animate(animation),
               child: child,
             ),
           );
         },
-        transitionDuration: const Duration(milliseconds: 1000),
+        transitionDuration: const Duration(milliseconds: 1200),
       ),
     );
   }
@@ -181,7 +259,8 @@ class _IntroScreenState extends State<IntroScreen>
 
     return Scaffold(
       body: GestureDetector(
-        onTap: _remainingSeconds > 0 ? null : _triggerBlast,
+        onTap: (!_isUnlocked || _remainingSeconds > 0) ? null : _triggerBlast,
+        // onTap: _remainingSeconds > 0 ? null : _triggerBlast,
         child: Stack(
           children: [
             // Animated Premium Background
@@ -197,13 +276,13 @@ class _IntroScreenState extends State<IntroScreen>
                           (_rotateController.value * 2 * math.pi) +
                           (2 * math.pi),
                       colors: const [
-                        Color(0xFFFF6B9D),
-                        Color(0xFFFFA07A),
-                        Color(0xFFFFD700),
-                        Color(0xFFC06C84),
-                        Color(0xFF6C5B7B),
-                        Color(0xFF355C7D),
-                        Color(0xFFFF6B9D),
+                        Color(0xFFE85B8A),
+                        Color(0xFFF5A69B),
+                        Color(0xFFFFCB7D),
+                        Color(0xFFB8616B),
+                        Color(0xFF8B6E8C),
+                        Color(0xFF6C7B9C),
+                        Color(0xFFE85B8A),
                       ],
                     ),
                   ),
@@ -348,20 +427,20 @@ class _IntroScreenState extends State<IntroScreen>
                                   boxShadow: [
                                     BoxShadow(
                                       color: const Color(
-                                        0xFFFF69B4,
-                                      ).withOpacity(0.6),
+                                        0xFFE85B8A,
+                                      ).withOpacity(0.5),
                                       blurRadius: 60,
                                       spreadRadius: 8,
                                       offset: const Offset(0, 25),
                                     ),
                                     BoxShadow(
-                                      color: Colors.orange.withOpacity(0.4),
+                                      color: Colors.orange.withOpacity(0.2),
                                       blurRadius: 50,
                                       spreadRadius: -5,
                                       offset: const Offset(0, 20),
                                     ),
                                     BoxShadow(
-                                      color: Colors.purple.withOpacity(0.3),
+                                      color: Colors.purple.withOpacity(0.15),
                                       blurRadius: 40,
                                       spreadRadius: -10,
                                       offset: const Offset(0, 15),
@@ -387,8 +466,8 @@ class _IntroScreenState extends State<IntroScreen>
                                       border: Border.all(
                                         width: 2,
                                         color: const Color(
-                                          0xFFFFB3C1,
-                                        ).withOpacity(0.4),
+                                          0xFFF5A8C6,
+                                        ).withOpacity(0.3),
                                       ),
                                     ),
                                     child: ClipRRect(
@@ -476,10 +555,10 @@ class _IntroScreenState extends State<IntroScreen>
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
                                                   colors: [
-                                                    const Color(0xFFFFF5F7),
+                                                    const Color(0xFFFFF9FB),
                                                     const Color(
-                                                      0xFFFFE5EC,
-                                                    ).withOpacity(0.8),
+                                                      0xFFFFEAF2,
+                                                    ).withOpacity(0.85),
                                                   ],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
@@ -488,22 +567,22 @@ class _IntroScreenState extends State<IntroScreen>
                                                     BorderRadius.circular(30),
                                                 border: Border.all(
                                                   color: const Color(
-                                                    0xFFFFB3C1,
-                                                  ).withOpacity(0.4),
+                                                    0xFFF5A8C6,
+                                                  ).withOpacity(0.3),
                                                   width: 2,
                                                 ),
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: const Color(
-                                                      0xFFFF69B4,
-                                                    ).withOpacity(0.2),
+                                                      0xFFE85B8A,
+                                                    ).withOpacity(0.15),
                                                     blurRadius: 15,
                                                     offset: const Offset(0, 5),
                                                   ),
                                                 ],
                                               ),
                                               child: Row(
-                                                mainAxisSize: MainAxisSize.min,
+                                                // mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   Container(
                                                     padding: EdgeInsets.all(
@@ -513,16 +592,16 @@ class _IntroScreenState extends State<IntroScreen>
                                                       gradient:
                                                           const LinearGradient(
                                                             colors: [
-                                                              Color(0xFFFF69B4),
-                                                              Color(0xFFFF8FB4),
+                                                              Color(0xFFE85B8A),
+                                                              Color(0xFFF18BA0),
                                                             ],
                                                           ),
                                                       shape: BoxShape.circle,
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: const Color(
-                                                            0xFFFF69B4,
-                                                          ).withOpacity(0.4),
+                                                            0xFFE85B8A,
+                                                          ).withOpacity(0.3),
                                                           blurRadius: 10,
                                                           spreadRadius: 2,
                                                         ),
@@ -562,7 +641,9 @@ class _IntroScreenState extends State<IntroScreen>
                                                           );
                                                         },
                                                         child: Text(
-                                                          '00:${_remainingSeconds.toString().padLeft(2, '0')}',
+                                                          formattedRemainingTime,
+
+                                                          // '00:${_remainingSeconds.toString().padLeft(2, '0')}',
                                                           style:
                                                               GoogleFonts.orbitron(
                                                                 fontSize:
@@ -605,29 +686,29 @@ class _IntroScreenState extends State<IntroScreen>
                                                       gradient: RadialGradient(
                                                         colors: [
                                                           const Color(
-                                                            0xFFFFB3C1,
-                                                          ).withOpacity(0.3),
+                                                            0xFFF5A8C6,
+                                                          ).withOpacity(0.25),
                                                           const Color(
-                                                            0xFFFF69B4,
-                                                          ).withOpacity(0.1),
+                                                            0xFFE85B8A,
+                                                          ).withOpacity(0.08),
                                                           Colors.transparent,
                                                         ],
                                                       ),
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: const Color(
-                                                            0xFFFF69B4,
+                                                            0xFFE85B8A,
                                                           ).withOpacity(
-                                                            0.4 *
+                                                            0.3 *
                                                                 _pulseAnimation
                                                                     .value,
                                                           ),
                                                           blurRadius:
-                                                              40 *
+                                                              35 *
                                                               _pulseAnimation
                                                                   .value,
                                                           spreadRadius:
-                                                              10 *
+                                                              8 *
                                                               _pulseAnimation
                                                                   .value,
                                                         ),
@@ -656,9 +737,9 @@ class _IntroScreenState extends State<IntroScreen>
                                               shaderCallback: (bounds) {
                                                 return const LinearGradient(
                                                   colors: [
-                                                    Color(0xFFFF69B4),
-                                                    Color(0xFFFF1493),
-                                                    Color(0xFFFF69B4),
+                                                    Color(0xFFE85B8A),
+                                                    Color(0xFFD6347D),
+                                                    Color(0xFFE85B8A),
                                                   ],
                                                 ).createShader(bounds);
                                               },
@@ -687,18 +768,18 @@ class _IntroScreenState extends State<IntroScreen>
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
                                                   colors: [
-                                                    const Color(0xFFFFF5F7),
+                                                    const Color(0xFFFFF9FB),
                                                     const Color(
-                                                      0xFFFFE5EC,
-                                                    ).withOpacity(0.6),
+                                                      0xFFFFEAF2,
+                                                    ).withOpacity(0.7),
                                                   ],
                                                 ),
                                                 borderRadius:
                                                     BorderRadius.circular(25),
                                                 border: Border.all(
                                                   color: const Color(
-                                                    0xFFFFB3C1,
-                                                  ).withOpacity(0.3),
+                                                    0xFFF5A8C6,
+                                                  ).withOpacity(0.25),
                                                   width: 1.5,
                                                 ),
                                               ),
@@ -721,7 +802,7 @@ class _IntroScreenState extends State<IntroScreen>
                                                       fontSize:
                                                           isDesktop ? 19 : 14,
                                                       color: const Color(
-                                                        0xFFFF1493,
+                                                        0xFFD6347D,
                                                       ),
                                                       fontWeight:
                                                           FontWeight.w700,
